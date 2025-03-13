@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Third-Party App Email Dashboard</title>
+    <!-- Firebase SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-firestore-compat.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dashboard {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .dashboard-header {
+            background-color: #4285f4;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-title {
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-email {
+            font-size: 14px;
+        }
+
+        .logout-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .logout-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .dashboard-controls {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            flex-grow: 1;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        .refresh-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #34a853;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .refresh-button:hover {
+            background-color: #2d9349;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 600;
+            margin: 10px 0;
+            color: #4285f4;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .app-insights {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .app-insights-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .app-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .app-tag {
+            padding: 5px 10px;
+            background-color: #e8f0fe;
+            color: #4285f4;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .app-tag:hover {
+            background-color: #d2e3fc;
+        }
+
+        .app-tag.selected {
+            background-color: #4285f4;
+            color: white;
+        }
+
+        .email-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            min-height: 600px;
+        }
+
+        .email-list {
+            border-right: 1px solid #eee;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .email-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .email-item:hover {
+            background-color: #f1f3f4;
+        }
+
+        .email-item.selected {
+            background-color: #e8f0fe;
+        }
+
+        .email-sender {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .email-subject {
+            color: #555;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 5px;
+        }
+
+        .email-apps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .email-app-tag {
+            padding: 2px 8px;
+            background-color: #e8f0fe;
+            color: #4285f4;
+            border-radius: 15px;
+            font-size: 11px;
+        }
+
+        .email-detail {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .email-detail-header {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .email-detail-subject {
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .email-detail-metadata {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 15px;
+            color: #666;
+        }
+
+        .email-detail-apps {
+            margin-top: 15px;
+        }
+
+        .email-detail-apps-title {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .email-detail-apps-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .email-detail-app {
+            padding: 5px 10px;
+            background-color: #e8f0fe;
+            color: #4285f4;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .email-detail-content {
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .loading, .error, .no-emails, .no-email-selected {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .error {
+            color: #ea4335;
+        }
+
+        @media (max-width: 768px) {
+            .email-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .email-list {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+                max-height: 300px;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-info {
+                margin-top: 10px;
+            }
+            
+            .dashboard-controls {
+                flex-wrap: wrap;
+            }
+            
+            .search-input {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard">
+            <div class="dashboard-header">
+                <div class="dashboard-title">Third-Party App Email Dashboard</div>
+                <div class="user-info">
+                    <span class="user-email" id="user-email">user@example.com</span>
+                    <a href="/logout" class="logout-button">Logout</a>
+                </div>
+            </div>
+
+            <div class="dashboard-controls">
+                <input type="text" id="search-input" class="search-input" placeholder="Search emails or apps...">
+                <select id="filter-select" class="filter-select">
+                    <option value="all">All Apps</option>
+                    <!-- App options will be dynamically added here -->
+                </select>
+                <button id="refresh-button" class="refresh-button">Refresh</button>
+            </div>
+
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Total Emails with 3rd Party Apps</div>
+                    <div class="stat-value" id="total-emails">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Unique 3rd Party Apps</div>
+                    <div class="stat-value" id="unique-apps">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Most Common App</div>
+                    <div class="stat-value" id="most-common-app">-</div>
+                </div>
+            </div>
+
+            <div class="app-insights">
+                <div class="app-insights-title">Popular Third-Party Apps</div>
+                <div class="app-tags" id="app-tags">
+                    <!-- App tags will be dynamically added here -->
+                </div>
+            </div>
+
+            <div id="loading" class="loading">Loading emails...</div>
+            <div id="error" class="error" style="display: none;"></div>
+            
+            <div id="email-container" class="email-container" style="display: none;">
+                <div id="email-list" class="email-list"></div>
+                <div id="email-detail" class="email-detail">
+                    <div class="no-email-selected">Select an email to view its contents</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDpp8drX0LVx-xy3YCWnqBpIg4laMmqeG4",
+            authDomain: "app-be96d.firebaseapp.com",
+            projectId: "app-be96d",
+            storageBucket: "app-be96d.firebasestorage.app",
+            messagingSenderId: "211546451764",
+            appId: "1:211546451764:web:d5e7e658feaf2e83b2bf61"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        // DOM Elements
+        const loadingEl = document.getElementById('loading');
+        const errorEl = document.getElementById('error');
+        const emailContainerEl = document.getElementById('email-container');
+        const emailListEl = document.getElementById('email-list');
+        const emailDetailEl = document.getElementById('email-detail');
+        const searchInputEl = document.getElementById('search-input');
+        const filterSelectEl = document.getElementById('filter-select');
+        const refreshButtonEl = document.getElementById('refresh-button');
+        const totalEmailsEl = document.getElementById('total-emails');
+        const uniqueAppsEl = document.getElementById('unique-apps');
+        const mostCommonAppEl = document.getElementById('most-common-app');
+        const appTagsEl = document.getElementById('app-tags');
+        const userEmailEl = document.getElementById('user-email');
+        
+        // State
+        let emails = [];
+        let selectedEmailId = null;
+        let searchTerm = '';
+        let filterValue = 'all';
+        let selectedAppTag = null;
+        let currentUserEmail = ''; // Will be set on load
+        
+        // Fetch user email from URL or session
+        function loadUserInfo() {
+            // Method 1: Get from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailParam = urlParams.get('email');
+            
+            if (emailParam) {
+                currentUserEmail = emailParam;
+                userEmailEl.textContent = emailParam;
+                return true;
+            }
+            
+            // Method 2: Try to get from local storage
+            const storedEmail = localStorage.getItem('userEmail');
+            if (storedEmail) {
+                currentUserEmail = storedEmail;
+                userEmailEl.textContent = storedEmail;
+                return true;
+            }
+            
+            // If we can't find the email, prompt the user
+            const promptedEmail = prompt("Please enter your email address to view your emails:", "");
+            if (promptedEmail) {
+                currentUserEmail = promptedEmail;
+                userEmailEl.textContent = promptedEmail;
+                // Save for future use
+                localStorage.setItem('userEmail', promptedEmail);
+                return true;
+            }
+            
+            return false;
+        }
+        
+        // Event Listeners
+        searchInputEl.addEventListener('input', (e) => {
+            searchTerm = e.target.value.toLowerCase();
+            renderEmailList();
+        });
+        
+        filterSelectEl.addEventListener('change', (e) => {
+            filterValue = e.target.value;
+            selectedAppTag = null;
+            updateAppTagSelection();
+            renderEmailList();
+        });
+        
+        refreshButtonEl.addEventListener('click', fetchEmails);
+        
+        // Functions
+        async function fetchEmails() {
+            try {
+                if (!currentUserEmail) {
+                    const emailLoaded = loadUserInfo();
+                    if (!emailLoaded) {
+                        errorEl.style.display = 'flex';
+                        errorEl.textContent = "Please provide an email address to view your emails.";
+                        loadingEl.style.display = 'none';
+                        return;
+                    }
+                }
+                
+                loadingEl.style.display = 'flex';
+                emailContainerEl.style.display = 'none';
+                errorEl.style.display = 'none';
+                
+                // First try all third-party emails
+                let emailsRef = db.collection('emails')
+                    .where('has_third_party_apps', '==', true)
+                    .limit(100);
+                
+                let snapshot = await emailsRef.get();
+                
+                // If that returned no results or permission error, try with user filtering
+                if (snapshot.empty) {
+                    emailsRef = db.collection('emails')
+                        .where('user_email', '==', currentUserEmail)
+                        .where('has_third_party_apps', '==', true);
+                    
+                    snapshot = await emailsRef.get();
+                }
+                
+                emails = [];
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    emails.push({
+                        id: doc.id,
+                        subject: data.subject || 'No Subject',
+                        sender: data.sender || 'Unknown Sender',
+                        body: data.body || '',
+                        apps: data.detected_apps || [],
+                        timestamp: data.created_at ? 
+                            (typeof data.created_at.toDate === 'function' ? data.created_at.toDate() : new Date(data.created_at)) 
+                            : new Date()
+                    });
+                });
+                
+                if (emails.length === 0) {
+                    errorEl.style.display = 'flex';
+                    errorEl.textContent = `No emails with third-party apps found for ${currentUserEmail}`;
+                    loadingEl.style.display = 'none';
+                    return;
+                }
+                
+                updateStats();
+                updateAppTags();
+                updateFilterOptions();
+                renderEmailList();
+                
+                loadingEl.style.display = 'none';
+                emailContainerEl.style.display = 'grid';
+            } catch (err) {
+                console.error("Error fetching emails:", err);
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'flex';
+                errorEl.textContent = "Failed to load emails: " + err.message;
+            }
+        }
+        
+        function updateStats() {
+            const totalEmails = emails.length;
+            
+            // Count unique apps
+            const allApps = emails.flatMap(email => email.apps);
+            const uniqueApps = [...new Set(allApps)];
+            
+            // Find most common app
+            const appCounts = {};
+            allApps.forEach(app => {
+                appCounts[app] = (appCounts[app] || 0) + 1;
+            });
+            
+            let mostCommonApp = '-';
+            let maxCount = 0;
+            
+            Object.entries(appCounts).forEach(([app, count]) => {
+                if (count > maxCount) {
+                    mostCommonApp = app;
+                    maxCount = count;
+                }
+            });
+            
+            totalEmailsEl.textContent = totalEmails;
+            uniqueAppsEl.textContent = uniqueApps.length;
+            mostCommonAppEl.textContent = mostCommonApp !== '-' ? mostCommonApp : '-';
+        }
+        
+        function updateAppTags() {
+            // Get all unique apps
+            const allApps = emails.flatMap(email => email.apps);
+            const uniqueApps = [...new Set(allApps)];
+            
+            // Count occurrences
+            const appCounts = {};
+            allApps.forEach(app => {
+                appCounts[app] = (appCounts[app] || 0) + 1;
+            });
+            
+            // Sort by occurrence count
+            const sortedApps = uniqueApps.sort((a, b) => appCounts[b] - appCounts[a]);
+            
+            // Take top 10
+            const topApps = sortedApps.slice(0, 10);
+            
+            // Create app tags
+            appTagsEl.innerHTML = '';
+            topApps.forEach(app => {
+                const tagEl = document.createElement('div');
+                tagEl.className = `app-tag ${app === selectedAppTag ? 'selected' : ''}`;
+                tagEl.textContent = `${app} (${appCounts[app]})`;
+                
+                tagEl.addEventListener('click', () => {
+                    if (selectedAppTag === app) {
+                        // Deselect if already selected
+                        selectedAppTag = null;
+                        filterValue = 'all';
+                        filterSelectEl.value = 'all';
+                    } else {
+                        // Select this app
+                        selectedAppTag = app;
+                        filterValue = app;
+                    }
+                    
+                    updateAppTagSelection();
+                    renderEmailList();
+                });
+                
+                appTagsEl.appendChild(tagEl);
+            });
+        }
+        
+        function updateAppTagSelection() {
+            // Update visual selection of app tags
+            const tagElements = appTagsEl.querySelectorAll('.app-tag');
+            tagElements.forEach(tag => {
+                const appName = tag.textContent.split(' (')[0];
+                if (appName === selectedAppTag) {
+                    tag.classList.add('selected');
+                } else {
+                    tag.classList.remove('selected');
+                }
+            });
+        }
+        
+        function updateFilterOptions() {
+            // Get all unique apps for the filter dropdown
+            const allApps = emails.flatMap(email => email.apps);
+            const uniqueApps = [...new Set(allApps)].sort();
+            
+            // Clear existing options (except 'All Apps')
+            while (filterSelectEl.options.length > 1) {
+                filterSelectEl.remove(1);
+            }
+            
+            // Add app options
+            uniqueApps.forEach(app => {
+                const option = document.createElement('option');
+                option.value = app;
+                option.textContent = app;
+                filterSelectEl.appendChild(option);
+            });
+        }
+        
+        function filterEmails() {
+            return emails.filter(email => {
+                // Apply app filter
+                if (filterValue !== 'all' && !email.apps.includes(filterValue)) {
+                    return false;
+                }
+                
+                // Apply search term
+                if (searchTerm) {
+                    const hasMatchingSubject = email.subject.toLowerCase().includes(searchTerm);
+                    const hasMatchingSender = email.sender.toLowerCase().includes(searchTerm);
+                    const hasMatchingBody = email.body.toLowerCase().includes(searchTerm);
+                    const hasMatchingApp = email.apps.some(app => app.toLowerCase().includes(searchTerm));
+                    
+                    return hasMatchingSubject || hasMatchingSender || hasMatchingBody || hasMatchingApp;
+                }
+                
+                return true;
+            });
+        }
+        
+        function renderEmailList() {
+            const filteredEmails = filterEmails();
+            
+            if (filteredEmails.length === 0) {
+                emailListEl.innerHTML = '<div class="no-emails">No emails found</div>';
+                emailDetailEl.innerHTML = '<div class="no-email-selected">No emails match your filters</div>';
+                return;
+            }
+            
+            emailListEl.innerHTML = '';
+            
+            filteredEmails.forEach(email => {
+                const emailItemEl = document.createElement('div');
+                emailItemEl.className = `email-item ${email.id === selectedEmailId ? 'selected' : ''}`;
+                
+                // Create app tags HTML
+                const appTagsHtml = email.apps.map(app => 
+                    `<span class="email-app-tag">${app}</span>`
+                ).join('');
+                
+                emailItemEl.innerHTML = `
+                    <div class="email-sender">${email.sender}</div>
+                    <div class="email-subject">${email.subject}</div>
+                    <div class="email-apps">${appTagsHtml}</div>
+                `;
+                
+                emailItemEl.addEventListener('click', () => {
+                    selectEmail(email);
+                });
+                
+                emailListEl.appendChild(emailItemEl);
+            });
+            
+            // If no email is selected but we have emails, select the first one
+            if (!selectedEmailId && filteredEmails.length > 0) {
+                selectEmail(filteredEmails[0]);
+            } else if (selectedEmailId) {
+                // Check if selected email is still in filtered list
+                const isSelectedEmailInList = filteredEmails.some(email => email.id === selectedEmailId);
+                if (!isSelectedEmailInList && filteredEmails.length > 0) {
+                    selectEmail(filteredEmails[0]);
+                } else if (!isSelectedEmailInList) {
+                    emailDetailEl.innerHTML = '<div class="no-email-selected">No emails match your filters</div>';
+                }
+            }
+        }
+        
+        function selectEmail(email) {
+            selectedEmailId = email.id;
+            
+            // Update visual selection
+            const emailItems = emailListEl.querySelectorAll('.email-item');
+            emailItems.forEach(item => {
+                item.classList.remove('selected');
+                if (item.querySelector('.email-subject').textContent === email.subject) {
+                    item.classList.add('selected');
+                }
+            });
+            
+            // Create app tags HTML
+            const appTagsHtml = email.apps.map(app => 
+                `<div class="email-detail-app">${app}</div>`
+            ).join('');
+            
+            // Format date
+            const formattedDate = email.timestamp ? email.timestamp.toLocaleString() : 'Unknown date';
+            
+            // Sanitize and format email body
+            const sanitizedBody = email.body
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\n/g, "<br>");
+            
+            emailDetailEl.innerHTML = `
+                <div class="email-detail-header">
+                    <div class="email-detail-subject">${email.subject}</div>
+                    <div class="email-detail-metadata">
+                        <div>From: ${email.sender}</div>
+                        <div>Date: ${formattedDate}</div>
+                    </div>
+                    <div class="email-detail-apps">
+                        <div class="email-detail-apps-title">Detected Third-Party Apps:</div>
+                        <div class="email-detail-apps-list">
+                            ${appTagsHtml}
+                        </div>
+                    </div>
+                </div>
+                <div class="email-detail-content">${sanitizedBody}</div>
+            `;
+        }
+        
+        // Initialize and load emails
+        if (loadUserInfo()) {
+            fetchEmails();
+        } else {
+            errorEl.style.display = 'flex';
+            errorEl.textContent = "Please provide an email address to view your emails.";
+            loadingEl.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

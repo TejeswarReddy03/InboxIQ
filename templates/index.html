@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InboxIQ | Smart Email Organization</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6528F7;
+            --primary-light: #8C52FF;
+            --secondary: #19B8FF;
+            --dark-bg: #0b0a13;
+            --card-bg: #14121f;
+            --text-white: #ffffff;
+            --text-light: rgba(255, 255, 255, 0.8);
+            --text-lighter: rgba(255, 255, 255, 0.6);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Navigation */
+        header {
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            background-color: rgba(11, 10, 19, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--text-white);
+            text-decoration: none;
+        }
+        
+        .logo i {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-right: 10px;
+            font-size: 26px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--text-white);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-outline {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-white);
+            background: transparent;
+        }
+        
+        .btn-outline:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .btn-gradient:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .btn-gradient:hover:before {
+            opacity: 1;
+        }
+        
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(101, 40, 247, 0.3);
+        }
+        
+        .btn-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-white);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 4.5rem;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            font-weight: 700;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-lighter);
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+        
+        .dashboard-preview {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            background-color: var(--card-bg);
+            height: 500px;
+        }
+        
+        .dashboard-content {
+            position: relative;
+            z-index: 3;
+            padding: 30px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dashboard-logo {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-white);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .dashboard-logo i {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .dashboard-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .dashboard-action {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .dashboard-stats {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--text-lighter);
+            font-size: 0.9rem;
+        }
+        
+        .integration-content {
+            position: relative;
+            z-index: 3;
+            padding: 30px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .integration-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(101, 40, 247, 0.1), rgba(25, 184, 255, 0.1));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .integration-icon i {
+            font-size: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .integration-connectors {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .connector {
+            width: 50px;
+            height: 15px;
+            border-radius: 20px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0.7;
+            animation: pulse 2s infinite alternate;
+        }
+        
+        .connector:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+        
+        .connector:nth-child(3) {
+            animation-delay: 1s;
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 0.5;
+                transform: scaleX(1);
+            }
+            100% {
+                opacity: 0.8;
+                transform: scaleX(1.2);
+            }
+        }
+        
+        .wave-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .wave-container.small {
+            height: 400px;
+        }
+        
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%236528F7' fill-opacity='0.2' d='M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+            background-size: 1440px 100px;
+            background-repeat: repeat-x;
+            animation: wave-animation 25s linear infinite;
+        }
+        
+        .wave-1 {
+            bottom: 0;
+            opacity: 0.7;
+            height: 80px;
+            animation-duration: 20s;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%236528F7' fill-opacity='0.2' d='M0,64L48,80C96,96,192,128,288,128C384,128,480,96,576,90.7C672,85,768,107,864,144C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+        }
+        
+        .wave-2 {
+            bottom: 10px;
+            opacity: 0.5;
+            height: 60px;
+            animation-duration: 17s;
+            animation-direction: reverse;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2319B8FF' fill-opacity='0.2' d='M0,256L48,261.3C96,267,192,277,288,266.7C384,256,480,224,576,213.3C672,203,768,213,864,208C960,203,1056,181,1152,186.7C1248,192,1344,224,1392,240L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+        }
+        
+        .wave-3 {
+            bottom: 20px;
+            opacity: 0.3;
+            height: 70px;
+            animation-duration: 25s;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%236528F7' fill-opacity='0.3' d='M0,224L48,240C96,256,192,288,288,277.3C384,267,480,213,576,176C672,139,768,117,864,128C960,139,1056,181,1152,192C1248,203,1344,181,1392,170.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+        }
+        
+        .wave-4 {
+            bottom: 30px;
+            opacity: 0.2;
+            height: 50px;
+            animation-duration: 15s;
+            animation-direction: reverse;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2319B8FF' fill-opacity='0.3' d='M0,160L48,144C96,128,192,96,288,101.3C384,107,480,149,576,170.7C672,192,768,192,864,170.7C960,149,1056,107,1152,101.3C1248,96,1344,128,1392,144L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+        }
+        
+        @keyframes wave-animation {
+            0% {
+                background-position-x: 0;
+            }
+            100% {
+                background-position-x: 1440px;
+            }
+        }
+        
+        .dashboard-overlay {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Features Section */
+        .features-section {
+            padding: 120px 0;
+            position: relative;
+        }
+        
+        .section-title {
+            font-size: 3rem;
+            line-height: 1.2;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+        
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(101, 40, 247, 0.1), rgba(25, 184, 255, 0.1));
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .feature-icon i {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 28px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .feature-card p {
+            color: var(--text-lighter);
+            line-height: 1.7;
+        }
+        
+        /* Integration Section */
+        .integration-section {
+            padding: 120px 0;
+            position: relative;
+        }
+        
+        .integration-container {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            overflow: hidden;
+        }
+        
+        .integration-content {
+            flex: 1;
+            padding-right: 40px;
+        }
+        
+        .integration-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 24px;
+        }
+        
+        .integration-content p {
+            color: var(--text-lighter);
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+        
+        .integration-logos {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .integration-logo {
+            height: 40px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .integration-logo:hover {
+            opacity: 1;
+        }
+        
+        .integration-image {
+            flex: 1;
+            position: relative;
+        }
+        
+        .integration-mockup {
+            width: 100%;
+            height: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            background-color: var(--card-bg);
+        }
+        
+        /* How it Works Section */
+        .how-it-works {
+            padding: 120px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .steps-container {
+            max-width: 900px;
+            margin: 60px auto 0;
+        }
+        
+        .step-cards {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .step-card {
+            flex: 1;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: left;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .step-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 3rem;
+            font-weight: 700;
+            opacity: 0.2;
+        }
+        
+        .step-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .step-card p {
+            color: var(--text-lighter);
+            line-height: 1.7;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(101, 40, 247, 0.1), transparent);
+            margin-bottom: 80px;
+        }
+        
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cta-title {
+            font-size: 2.5rem;
+            margin-bottom: 24px;
+        }
+        
+        .cta-subtitle {
+            color: var(--text-lighter);
+            margin-bottom: 40px;
+            font-size: 1.25rem;
+        }
+        
+        /* Footer */
+        footer {
+            padding: 80px 0 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .footer-container {
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 60px;
+        }
+        
+        .footer-brand {
+            margin-bottom: 20px;
+        }
+        
+        .footer-brand p {
+            color: var(--text-lighter);
+            margin-top: 20px;
+            line-height: 1.7;
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .footer-social a {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-lighter);
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-social a:hover {
+            color: var(--text-white);
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+        
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .footer-links h4 {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            color: var(--text-white);
+        }
+        
+        .footer-links a {
+            color: var(--text-lighter);
+            text-decoration: none;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--text-white);
+            transform: translateX(5px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 60px;
+            color: var(--text-lighter);
+            font-size: 0.9rem;
+        }
+        
+        /* Background Waves */
+        .background-waves {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -2;
+        }
+        
+        .bg-wave {
+            position: absolute;
+            width: 100%;
+            height: 300px;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
+        
+        .bg-wave-1 {
+            top: 50%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%236528F7' fill-opacity='0.05' d='M0,128L80,144C160,160,320,192,480,181.3C640,171,800,117,960,117.3C1120,117,1280,171,1360,197.3L1440,224L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+        }
+        
+        .bg-wave-2 {
+            top: 60%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2319B8FF' fill-opacity='0.05' d='M0,224L80,202.7C160,181,320,139,480,138.7C640,139,800,181,960,197.3C1120,213,1280,203,1360,197.3L1440,192L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+        }
+        
+        .bg-wave-3 {
+            top: 70%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%236528F7' fill-opacity='0.03' d='M0,64L80,85.3C160,107,320,149,480,160C640,171,800,149,960,149.3C1120,149,1280,171,1360,181.3L1440,192L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+        }
+        
+        /* Gradient Orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.5;
+        }
+        
+        .orb-1 {
+            background-color: var(--primary);
+            width: 300px;
+            height: 300px;
+            top: 0;
+            right: 0;
+            transform: translate(30%, -30%);
+        }
+        
+        .orb-2 {
+            background-color: var(--secondary);
+            width: 400px;
+            height: 400px;
+            bottom: 0;
+            left: 0;
+            transform: translate(-30%, 30%);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .hero-title {
+                font-size: 3rem;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+            }
+            
+            .integration-container {
+                flex-direction: column;
+                gap: 40px;
+            }
+            
+            .integration-content {
+                padding-right: 0;
+            }
+            
+            .footer-container {
+                grid-template-columns: 1fr 1fr;
+                gap: 40px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .step-cards {
+                flex-direction: column;
+            }
+            
+            .feature-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background-color: var(--dark-bg);
+            overflow: hidden;
+            transition: height 0.3s ease;
+            z-index: 999;
+        }
+        
+        .mobile-menu.active {
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+        
+        .mobile-menu-content {
+            padding: 30px 20px;
+        }
+        
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .mobile-nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 18px;
+            padding: 10px 0;
+        }
+        
+        .mobile-menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <i class="fas fa-inbox"></i>
+                InboxIQ
+            </a>
+            
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how">How It Works</a>
+                <a href="#integrations">Integrations</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#about">About</a>
+            </div>
+            
+            <div class="nav-buttons">
+                <a href="#" class="btn btn-outline">Login</a>
+                <a href="/login" class="btn btn-gradient">
+                    <i class="fab fa-google btn-icon"></i>
+                    Login with Google
+                </a>
+            </div>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+    
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <div class="mobile-nav-links">
+                <a href="#features">Features</a>
+                <a href="#how">How It Works</a>
+                <a href="#integrations">Integrations</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#about">About</a>
+            </div>
+            
+            <div class="mobile-menu-buttons">
+                <a href="#" class="btn btn-outline">Login</a>
+                <a href="/login" class="btn btn-gradient">
+                    <i class="fab fa-google btn-icon"></i>
+                    Login with Google
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <section class="hero">
+        <div class="background-waves">
+            <div class="bg-wave bg-wave-1"></div>
+            <div class="bg-wave bg-wave-2"></div>
+            <div class="bg-wave bg-wave-3"></div>
+        </div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        
+        <div class="container hero-content">
+            <h1 class="hero-title">
+                Smart <span class="gradient-text">Email Organization</span> on Autopilot
+            </h1>
+            <p class="hero-subtitle">
+                Automatically group emails by projects, vendors, and priorities. Save hours every week and achieve inbox zero without the effort.
+            </p>
+            
+            <div class="hero-buttons">
+                <a href="/login" class="btn btn-gradient">
+                    <i class="fab fa-google btn-icon"></i>
+                    Login with Google
+                </a>
+                <a href="#features" class="btn btn-outline">
+                    <i class="fas fa-arrow-down btn-icon"></i>
+                    Explore Features
+                </a>
+            </div>
+            
+            <div class="dashboard-preview">
+                <div class="dashboard-preview">
+                    <div class="wave-container">
+                        <div class="wave wave-1"></div>
+                        <div class="wave wave-2"></div>
+                        <div class="wave wave-3"></div>
+                        <div class="wave wave-4"></div>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="dashboard-header">
+                            <div class="dashboard-logo"><i class="fas fa-inbox"></i> InboxIQ</div>
+                            <div class="dashboard-actions">
+                                <div class="dashboard-action"></div>
+                                <div class="dashboard-action"></div>
+                                <div class="dashboard-action"></div>
+                            </div>
+                        </div>
+                        <div class="dashboard-stats">
+                            <div class="stat-card">
+                                <div class="stat-number">84%</div>
+                                <div class="stat-label">Organized</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">24</div>
+                                <div class="stat-label">Categories</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">3.2</div>
+                                <div class="stat-label">hrs saved</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="features-section" id="features">
+        <div class="container">
+            <h2 class="section-title">
+                Your <span class="gradient-text">First Line</span> of Email Defense
+            </h2>
+            
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3>Smart Categorization</h3>
+                    <p>Our AI automatically groups related emails into projects, vendors, and custom categories, bringing order to inbox chaos with minimal effort.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Priority Alerts</h3>
+                    <p>Only get notifications for what matters. Set custom rules for priority emails while silently organizing everything else in the background.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Advanced Search</h3>
+                    <p>Find any email in seconds with our powerful contextual search that understands relationships between messages, projects, and topics.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Time-saving Workflows</h3>
+                    <p>Create custom email workflows that handle repetitive tasks automatically, saving you hours every week and reducing email fatigue.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3>Email Analytics</h3>
+                    <p>Gain deep insights into your communication patterns and discover opportunities to improve your email productivity and response time.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Privacy Focused</h3>
+                    <p>Your data is yours alone. We use zero-knowledge encryption and never scan your emails for advertising or third-party purposes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="integration-section" id="integrations">
+        <div class="container integration-container">
+            <div class="integration-content">
+                <h2>
+                    <span class="gradient-text">Seamless</span> Integration with Your Workflow
+                </h2>
+                <p>
+                    InboxIQ works wherever you do. Integrate directly with Gmail, Outlook, and other major email providers with a single click. Our simple API also makes it easy to connect with your existing productivity tools.
+                </p>
+                
+                <div class="integration-logos">
+                    <img src="/api/placeholder/120/40" alt="Gmail" class="integration-logo">
+                    <img src="/api/placeholder/120/40" alt="Outlook" class="integration-logo">
+                    <img src="/api/placeholder/120/40" alt="Slack" class="integration-logo">
+                    <img src="/api/placeholder/120/40" alt="Notion" class="integration-logo">
+                </div>
+                
+                <a href="#" class="btn btn-gradient">
+                    <i class="fas fa-plug btn-icon"></i>
+                    View All Integrations
+                </a>
+            </div>
+            
+            <div class="integration-image">
+                <div class="integration-mockup">
+                    <div class="wave-container small">
+                        <div class="wave wave-1"></div>
+                        <div class="wave wave-2"></div>
+                        <div class="wave wave-3"></div>
+                    </div>
+                    <div class="integration-content">
+                        <div class="integration-icon"><i class="fas fa-plug"></i></div>
+                        <div class="integration-connectors">
+                            <div class="connector"></div>
+                            <div class="connector"></div>
+                            <div class="connector"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="how-it-works" id="how">
+        <div class="container">
+            <h2 class="section-title">
+                <span class="gradient-text">Using AI</span> to Stay Ahead of Email Overload
+            </h2>
+            
+            <div class="steps-container">
+                <div class="step-cards">
+                    <div class="step-card">
+                        <div class="step-number">01</div>
+                        <h3>Connect</h3>
+                        <p>Connect your email account with a single click. We support Gmail, Outlook, Yahoo, and other major email providers with secure OAuth integration.</p>
+                    </div>
+                    
+                    <div class="step-card">
+                        <div class="step-number">02</div>
+                        <h3>Categorize</h3>
+                        <p>Our AI automatically analyzes your email patterns and suggests custom categories for projects, clients, subscriptions, and more.</p>
+                    </div>
+                    
+                    <div class="step-card">
+                        <div class="step-number">03</div>
+                        <h3>Automate</h3>
+                        <p>Set up custom rules and smart filters that work silently in the background to keep your inbox organized at all times.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="cta-section">
+        <div class="container cta-container">
+            <h2 class="cta-title">Ready to Transform Your Inbox?</h2>
+            <p class="cta-subtitle">Join thousands of professionals who have reclaimed hours of their week with intelligent email organization.</p>
+            <a href="/login" class="btn btn-gradient">
+                <i class="fab fa-google btn-icon"></i>
+                Login with Google
+            </a>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container footer-container">
+            <div class="footer-brand">
+                <a href="#" class="logo">
+                    <i class="fas fa-inbox"></i>
+                    InboxIQ
+                </a>
+                <p>
+                    InboxIQ helps busy professionals achieve inbox zero through AI-powered email organization. Save time, reduce stress, and never miss an important message again.
+                </p>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Product</h4>
+                <a href="#">Features</a>
+                <a href="#">Pricing</a>
+                <a href="#">Integrations</a>
+                <a href="#">Roadmap</a>
+                <a href="#">Updates</a>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Company</h4>
+                <a href="#">About Us</a>
+                <a href="#">Blog</a>
+                <a href="#">Careers</a>
+                <a href="#">Press</a>
+                <a href="#">Contact</a>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <a href="#">Help Center</a>
+                <a href="#">Community</a>
+                <a href="#">Developers</a>
+                <a href="#">API Docs</a>
+                <a href="#">Status</a>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2025 InboxIQ. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            
+            if (mobileMenu.classList.contains('active')) {
+                mobileMenuBtn.innerHTML = '<i class="fas fa-times"></i>';
+                document.body.style.overflow = 'hidden';
+            } else {
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                if (this.getAttribute('href') === '#') return;
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    if (mobileMenu.classList.contains('active')) {
+                        mobileMenu.classList.remove('active');
+                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                        document.body.style.overflow = 'auto';
+                    }
+                }
+            });
+        });
+        
+        // Animation on scroll (basic implementation)
+        const animateElements = document.querySelectorAll('.feature-card, .step-card');
+        
+        function checkPosition() {
+            animateElements.forEach(element => {
+                const positionFromTop = element.getBoundingClientRect().top;
+                
+                if (positionFromTop - window.innerHeight <= -100) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        }
+        
+     
+
+            animateElements.forEach(element => {
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(30px)';
+    element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+});
+
+// Check positions initially
+checkPosition();
+
+// Check positions on scroll
+window.addEventListener('scroll', checkPosition);
+
+// Smooth header transition on scroll
+const header = document.querySelector('header');
+
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+        header.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.1)';
+        header.style.backdropFilter = 'blur(20px)';
+        header.style.background = 'rgba(11, 10, 19, 0.98)';
+    } else {
+        header.style.boxShadow = 'none';
+        header.style.backdropFilter = 'blur(10px)';
+        header.style.background = 'rgba(11, 10, 19, 0.95)';
+    }
+});
+
+// Statistics counter animation
+const statNumbers = document.querySelectorAll('.stat-number');
+const options = {
+    threshold: 0.5
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const element = entry.target;
+            const value = element.innerText;
+            
+            // Handle percentage values
+            if (value.includes('%')) {
+                animateCounter(element, 0, parseInt(value), '%');
+            } else {
+                animateCounter(element, 0, parseFloat(value), '');
+            }
+            
+            observer.unobserve(element);
+        }
+    });
+}, options);
+
+statNumbers.forEach(stat => {
+    observer.observe(stat);
+});
+
+function animateCounter(element, start, end, suffix) {
+    const duration = 2000; // ms
+    const frameDuration = 1000 / 60; // 60fps
+    const totalFrames = Math.round(duration / frameDuration);
+    const countIncrement = (end - start) / totalFrames;
+    
+    let currentCount = start;
+    let frame = 0;
+    
+    const counter = setInterval(() => {
+        frame++;
+        currentCount += countIncrement;
+        
+        if (suffix === '%' || Number.isInteger(end)) {
+            element.textContent = Math.floor(currentCount) + suffix;
+        } else {
+            element.textContent = currentCount.toFixed(1) + suffix;
+        }
+        
+        if (frame === totalFrames) {
+            clearInterval(counter);
+            element.textContent = end + suffix;
+        }
+    }, frameDuration);
+}
+
+// Add active state to nav links on scroll
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a, .mobile-nav-links a');
+
+window.addEventListener('scroll', () => {
+    let current = '';
+    
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        
+        if (window.scrollY >= (sectionTop - 200)) {
+            current = section.getAttribute('id');
+        }
+    });
+    
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+            link.classList.add('active');
+            link.style.color = 'var(--text-white)';
+        } else {
+            link.style.color = '';
+        }
+    });
+});
+
+// Form submission placeholder (if there's a form on the page)
+const formElements = document.querySelectorAll('form');
+
+formElements.forEach(form => {
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Show loading state
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) {
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitButton.disabled = true;
+            
+            // Simulate form submission
+            setTimeout(() => {
+                submitButton.innerHTML = '<i class="fas fa-check"></i> Success!';
+                
+                // Reset form
+                setTimeout(() => {
+                    form.reset();
+                    submitButton.innerHTML = originalText;
+                    submitButton.disabled = false;
+                }, 2000);
+            }, 1500);
+        }
+    });
+});
