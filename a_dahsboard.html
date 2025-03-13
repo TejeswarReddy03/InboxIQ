@@ -491,21 +491,13 @@
                 emailContainerEl.style.display = 'none';
                 errorEl.style.display = 'none';
                 
-                // First try all third-party emails
-                let emailsRef = db.collection('emails')
+                // Always filter by user email to only fetch emails for the specific user
+                const emailsRef = db.collection('emails')
+                    .where('user_email', '==', currentUserEmail)
                     .where('has_third_party_apps', '==', true)
                     .limit(100);
                 
-                let snapshot = await emailsRef.get();
-                
-                // If that returned no results or permission error, try with user filtering
-                if (snapshot.empty) {
-                    emailsRef = db.collection('emails')
-                        .where('user_email', '==', currentUserEmail)
-                        .where('has_third_party_apps', '==', true);
-                    
-                    snapshot = await emailsRef.get();
-                }
+                const snapshot = await emailsRef.get();
                 
                 emails = [];
                 snapshot.forEach((doc) => {
