@@ -72,7 +72,7 @@ def login():
         "https://accounts.google.com/o/oauth2/auth"
         "?response_type=code"
         f"&client_id={GOOGLE_CLIENT_ID}"
-        "&redirect_uri=http://127.0.0.1:5000/auth/callback"
+        "&redirect_uri=https://inboxiq.onrender.com/auth/callback"
         "&scope=openid%20email%20profile%20https://mail.google.com/"
         "&access_type=offline"
         "&prompt=consent"
@@ -88,7 +88,7 @@ def auth_callback():
         "code": code,
         "client_id": GOOGLE_CLIENT_ID,
         "client_secret": GOOGLE_CLIENT_SECRET,
-        "redirect_uri": "http://127.0.0.1:5000/auth/callback",
+        "redirect_uri": "https://inboxiq.onrender.com/auth/callback",
         "grant_type": "authorization_code",
     }
     token_response = requests.post(token_url, data=token_data)
