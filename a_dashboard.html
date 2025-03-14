@@ -436,6 +436,7 @@
                         <option value="all">All Apps</option>
                         <!-- App options will be dynamically added here -->
                     </select>
+                    <button id="delete-button" class="delete-button">Delete Mails</button>
                     <button id="refresh-button" class="refresh-button">Refresh</button>
                 </div>
 
@@ -474,273 +475,368 @@
         </div>
     </div>
 
-    <script>
-        // Add mock data for testing if Firestore connection fails
-        const mockUsers = [
-            { email: "john.doe@example.com", emailCount: 12, uniqueAppCount: 5 },
-            { email: "jane.smith@example.com", emailCount: 8, uniqueAppCount: 3 },
-            { email: "robert.johnson@example.com", emailCount: 15, uniqueAppCount: 7 },
-            { email: "sarah.williams@example.com", emailCount: 6, uniqueAppCount: 2 },
-            { email: "michael.brown@example.com", emailCount: 9, uniqueAppCount: 4 }
-        ];
-        
-        const mockEmails = [
-            {
-                id: "email1",
-                subject: "Meeting with Client",
-                sender: "client@company.com",
-                body: "Let's discuss the project details tomorrow at 10 AM.",
-                apps: ["Zoom", "Calendar", "Slack"],
-                timestamp: new Date()
-            },
-            {
-                id: "email2",
-                subject: "Project Update",
-                sender: "manager@company.com",
-                body: "Please find attached the latest project report.",
-                apps: ["Dropbox", "Asana"],
-                timestamp: new Date()
-            },
-            {
-                id: "email3",
-                subject: "Invoice #1234",
-                sender: "billing@supplier.com",
-                body: "Your invoice is due in 7 days.",
-                apps: ["QuickBooks", "PayPal"],
-                timestamp: new Date()
-            }
-        ];
-    
-        // Initialize Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDpp8drX0LVx-xy3YCWnqBpIg4laMmqeG4",
-            authDomain: "app-be96d.firebaseapp.com",
-            projectId: "app-be96d",
-            storageBucket: "app-be96d.firebasestorage.app",
-            messagingSenderId: "211546451764",
-            appId: "1:211546451764:web:d5e7e658feaf2e83b2bf61"
-        };
-        
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        
-        // DOM Elements - User List View
-        const userListViewEl = document.getElementById('user-list-view');
-        const userListEl = document.getElementById('user-list');
-        const loadingUsersEl = document.getElementById('loading-users');
-        const errorUsersEl = document.getElementById('error-users');
-        const userSearchInputEl = document.getElementById('user-search-input');
-        const refreshUsersButtonEl = document.getElementById('refresh-users-button');
-
-        // DOM Elements - Email View
-        const emailViewEl = document.getElementById('email-view');
-        const loadingEl = document.getElementById('loading');
-        const errorEl = document.getElementById('error');
-        const emailContainerEl = document.getElementById('email-container');
-        const emailListEl = document.getElementById('email-list');
-        const emailDetailEl = document.getElementById('email-detail');
-        const searchInputEl = document.getElementById('search-input');
-        const filterSelectEl = document.getElementById('filter-select');
-        const refreshButtonEl = document.getElementById('refresh-button');
-        const totalEmailsEl = document.getElementById('total-emails');
-        const uniqueAppsEl = document.getElementById('unique-apps');
-        const mostCommonAppEl = document.getElementById('most-common-app');
-        const appTagsEl = document.getElementById('app-tags');
-        const userEmailEl = document.getElementById('user-email');
-        const backButtonEl = document.getElementById('back-button');
-        
-        // State
-        let users = [];
-        let userSearchTerm = '';
-        let selectedUserEmail = null;
-        
-        let emails = [];
-        let selectedEmailId = null;
-        let searchTerm = '';
-        let filterValue = 'all';
-        let selectedAppTag = null;
-        
-        // Event Listeners - User List
-        userSearchInputEl.addEventListener('input', (e) => {
-            userSearchTerm = e.target.value.toLowerCase();
-            renderUserList();
-        });
-        
-        refreshUsersButtonEl.addEventListener('click', fetchUsers);
-        
-        // Event Listeners - Email View
-        backButtonEl.addEventListener('click', () => {
-            showUserListView();
-        });
-        
-        searchInputEl.addEventListener('input', (e) => {
-            searchTerm = e.target.value.toLowerCase();
-            renderEmailList();
-        });
-        
-        filterSelectEl.addEventListener('change', (e) => {
-            filterValue = e.target.value;
-            selectedAppTag = null;
-            updateAppTagSelection();
-            renderEmailList();
-        });
-        
-        refreshButtonEl.addEventListener('click', () => {
-            fetchEmails(selectedUserEmail);
-        });
-        
-        // Functions - View Management
-        function showUserListView() {
-            userListViewEl.style.display = 'block';
-            emailViewEl.style.display = 'none';
-            backButtonEl.style.display = 'none';
-            userEmailEl.textContent = 'Select a user';
-            selectedUserEmail = null;
-        }
-        
-        function showEmailView(userEmail) {
-            userListViewEl.style.display = 'none';
-            emailViewEl.style.display = 'block';
-            backButtonEl.style.display = 'inline-block';
-            userEmailEl.textContent = userEmail;
-            selectedUserEmail = userEmail;
+        <script>
+            // Add mock data for testing if Firestore connection fails
+            const mockUsers = [
+                { email: "john.doe@example.com", emailCount: 12, uniqueAppCount: 5 },
+                { email: "jane.smith@example.com", emailCount: 8, uniqueAppCount: 3 },
+                { email: "robert.johnson@example.com", emailCount: 15, uniqueAppCount: 7 },
+                { email: "sarah.williams@example.com", emailCount: 6, uniqueAppCount: 2 },
+                { email: "michael.brown@example.com", emailCount: 9, uniqueAppCount: 4 }
+            ];
             
-            // Reset email view state
-            emails = [];
-            selectedEmailId = null;
-            searchTerm = '';
-            filterValue = 'all';
-            selectedAppTag = null;
-            
-            // Clear UI elements
-            searchInputEl.value = '';
-            filterSelectEl.value = 'all';
-            
-            // Fetch emails for the selected user
-            fetchEmails(userEmail);
-        }
+            const mockEmails = [
+                {
+                    id: "email1",
+                    messageId: "msg_123456",
+                    subject: "Meeting with Client",
+                    sender: "client@company.com",
+                    body: "Let's discuss the project details tomorrow at 10 AM.",
+                    apps: ["Zoom", "Calendar", "Slack"],
+                    timestamp: new Date()
+                },
+                {
+                    id: "email2",
+                    messageId: "msg_789012",
+                    subject: "Project Update",
+                    sender: "manager@company.com",
+                    body: "Please find attached the latest project report.",
+                    apps: ["Dropbox", "Asana"],
+                    timestamp: new Date()
+                },
+                {
+                    id: "email3",
+                    messageId: "msg_345678",
+                    subject: "Invoice #1234",
+                    sender: "billing@supplier.com",
+                    body: "Your invoice is due in 7 days.",
+                    apps: ["QuickBooks", "PayPal"],
+                    timestamp: new Date()
+                }
+            ];
         
-        // Functions - User List
-        async function fetchUsers() {
-            try {
-                console.log("Starting fetchUsers function");
-                
-                // Make sure elements exist before accessing them
-                if (!loadingUsersEl || !userListEl || !errorUsersEl) {
-                    console.error("DOM elements not found, retrying in 500ms");
-                    setTimeout(fetchUsers, 500);
-                    return;
-                }
-                
-                loadingUsersEl.style.display = 'flex';
-                userListEl.style.display = 'none';
-                errorUsersEl.style.display = 'none';
-                
-                console.log("Querying Firestore for users with third-party app emails");
-                
-                // Get distinct users who have emails with third-party apps
-                const emailsRef = db.collection('emails')
-                    .where('has_third_party_apps', '==', true)
-                    .limit(100);
-                
-                console.log("Awaiting Firestore results...");
-                const snapshot = await emailsRef.get();
-                console.log(`Received ${snapshot.size} documents from Firestore`);
-                
-                // Extract unique user emails and count their emails with third-party apps
-                const userEmailMap = {};
-                
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const userEmail = data.user_email;
-                    
-                    if (userEmail) {
-                        if (!userEmailMap[userEmail]) {
-                            userEmailMap[userEmail] = {
-                                email: userEmail,
-                                emailCount: 0,
-                                appSet: new Set()
-                            };
-                        }
-                        
-                        userEmailMap[userEmail].emailCount++;
-                        
-                        // Track unique apps for this user
-                        if (data.detected_apps && Array.isArray(data.detected_apps)) {
-                            data.detected_apps.forEach(app => {
-                                userEmailMap[userEmail].appSet.add(app);
-                            });
-                        }
-                    }
-                });
-                
-                // Convert to array and sort by email count (descending)
-                users = Object.values(userEmailMap).map(user => ({
-                    email: user.email,
-                    emailCount: user.emailCount,
-                    uniqueAppCount: user.appSet.size
-                }));
-                
-                users.sort((a, b) => b.emailCount - a.emailCount);
-                
-                console.log(`Processed ${users.length} unique users with third-party app emails`);
-                
-                if (users.length === 0) {
-                    console.log("No users found, showing error message");
-                    errorUsersEl.style.display = 'flex';
-                    errorUsersEl.textContent = "No users with third-party app emails found";
-                    loadingUsersEl.style.display = 'none';
-                    return;
-                }
-                
-                // In case there are mock users available for testing
-                if (users.length === 0 && typeof mockUsers !== 'undefined' && mockUsers.length > 0) {
-                    console.log("Using mock user data for testing");
-                    users = mockUsers;
-                }
-                
-                console.log("Rendering user list");
+            // Initialize Firebase
+            const firebaseConfig = {
+                apiKey: "AIzaSyDpp8drX0LVx-xy3YCWnqBpIg4laMmqeG4",
+                authDomain: "app-be96d.firebaseapp.com",
+                projectId: "app-be96d",
+                storageBucket: "app-be96d.firebasestorage.app",
+                messagingSenderId: "211546451764",
+                appId: "1:211546451764:web:d5e7e658feaf2e83b2bf61"
+            };
+            
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+            
+            // DOM Elements - User List View
+            const userListViewEl = document.getElementById('user-list-view');
+            const userListEl = document.getElementById('user-list');
+            const loadingUsersEl = document.getElementById('loading-users');
+            const errorUsersEl = document.getElementById('error-users');
+            const userSearchInputEl = document.getElementById('user-search-input');
+            const refreshUsersButtonEl = document.getElementById('refresh-users-button');
+        
+            // DOM Elements - Email View
+            const emailViewEl = document.getElementById('email-view');
+            const loadingEl = document.getElementById('loading');
+            const errorEl = document.getElementById('error');
+            const emailContainerEl = document.getElementById('email-container');
+            const emailListEl = document.getElementById('email-list');
+            const emailDetailEl = document.getElementById('email-detail');
+            const searchInputEl = document.getElementById('search-input');
+            const filterSelectEl = document.getElementById('filter-select');
+            const refreshButtonEl = document.getElementById('refresh-button');
+            const deleteButtonEl = document.getElementById('delete-button');
+            const totalEmailsEl = document.getElementById('total-emails');
+            const uniqueAppsEl = document.getElementById('unique-apps');
+            const mostCommonAppEl = document.getElementById('most-common-app');
+            const appTagsEl = document.getElementById('app-tags');
+            const userEmailEl = document.getElementById('user-email');
+            const backButtonEl = document.getElementById('back-button');
+            
+            // State
+            let users = [];
+            let userSearchTerm = '';
+            let selectedUserEmail = null;
+            let selectedUserData = null;
+            
+            let emails = [];
+            let selectedEmailId = null;
+            let searchTerm = '';
+            let filterValue = 'all';
+            let selectedAppTag = null;
+            
+            // Event Listeners - User List
+            userSearchInputEl.addEventListener('input', (e) => {
+                userSearchTerm = e.target.value.toLowerCase();
                 renderUserList();
+            });
+            
+            refreshUsersButtonEl.addEventListener('click', fetchUsers);
+            
+            // Event Listeners - Email View
+            backButtonEl.addEventListener('click', () => {
+                showUserListView();
+            });
+            
+            searchInputEl.addEventListener('input', (e) => {
+                searchTerm = e.target.value.toLowerCase();
+                renderEmailList();
+            });
+            
+            filterSelectEl.addEventListener('change', (e) => {
+                filterValue = e.target.value;
+                selectedAppTag = null;
+                updateAppTagSelection();
+                renderEmailList();
+            });
+            
+            refreshButtonEl.addEventListener('click', () => {
+                fetchEmails(selectedUserEmail);
+            });
+            
+            deleteButtonEl.addEventListener('click', () => {
+                if (!selectedUserData) {
+                    // Try to fetch user data first if it's not available
+                    fetchUserData(selectedUserEmail).then(userData => {
+                        if (userData) {
+                            selectedUserData = userData;
+                            deleteAllEmails();
+                        }
+                    });
+                } else {
+                    deleteAllEmails();
+                }
+            });
+            
+            // Functions - View Management
+            function showUserListView() {
+                userListViewEl.style.display = 'block';
+                emailViewEl.style.display = 'none';
+                backButtonEl.style.display = 'none';
+                userEmailEl.textContent = 'Select a user';
+                selectedUserEmail = null;
+                selectedUserData = null;
+            }
+            
+            function showEmailView(userEmail) {
+                userListViewEl.style.display = 'none';
+                emailViewEl.style.display = 'block';
+                backButtonEl.style.display = 'inline-block';
+                userEmailEl.textContent = userEmail;
+                selectedUserEmail = userEmail;
                 
-                loadingUsersEl.style.display = 'none';
-                userListEl.style.display = 'grid';
-                console.log("User list displayed");
-            } catch (err) {
-                console.error("Error fetching users:", err);
-                loadingUsersEl.style.display = 'none';
-                errorUsersEl.style.display = 'flex';
-                errorUsersEl.textContent = "Failed to load users: " + err.message;
+                // Reset email view state
+                emails = [];
+                selectedEmailId = null;
+                searchTerm = '';
+                filterValue = 'all';
+                selectedAppTag = null;
+                
+                // Clear UI elements
+                searchInputEl.value = '';
+                filterSelectEl.value = 'all';
+                
+                // Fetch user data (for tokens) then fetch emails
+                fetchUserData(userEmail).then(userData => {
+                    // Store user data globally
+                    selectedUserData = userData;
+                    // Then fetch emails
+                    fetchEmails(userEmail);
+                });
             }
+            
+            // Function to fetch user data including tokens - simplified to use prompt
+          // Function to fetch user data including tokens from Firestore users collection
+async function fetchUserData(userEmail) {
+    try {
+        console.log(`Fetching data for user: ${userEmail}`);
+        
+        // Direct document lookup using email as the document ID
+        const userDoc = await db.collection('users').doc(userEmail).get();
+        
+        // If direct document lookup fails, try querying by email field
+        if (!userDoc.exists) {
+            console.log("User document not found by direct ID, trying query...");
+            const userQuery = db.collection('users').where('email', '==', userEmail);
+            const userSnapshot = await userQuery.get();
+            
+            if (userSnapshot.empty) {
+                console.log(`No user data found for ${userEmail}`);
+                
+                // Fallback to prompt if needed
+                const usePrompt = confirm("User authentication data not found. Would you like to enter an access token manually?");
+                if (usePrompt) {
+                    const token = prompt("Enter your Gmail API access token:", "");
+                    if (token) {
+                        return {
+                            email: userEmail,
+                            access_token: token
+                        };
+                    }
+                }
+                
+                alert(`No authentication data found for ${userEmail}. Cannot delete emails.`);
+                return null;
+            }
+            
+            // Get the first matching document
+            const userData = userSnapshot.docs[0].data();
+            console.log(`User authentication data retrieved for: ${userEmail}`);
+            return userData;
         }
         
-        function renderUserList() {
-            console.log(`Rendering user list with ${users.length} users`);
+        // If direct document lookup succeeds
+        const userData = userDoc.data();
+        console.log(`User authentication data retrieved for: ${userEmail}`);
+        return userData;
+    } catch (err) {
+        console.error("Error fetching user data:", err);
+        
+        // Handle permission errors
+        if (err.code === 'permission-denied') {
+            alert("Permission denied when accessing user data. Please check your database rules.");
             
-            // Filter users by search term if provided
-            const filteredUsers = userSearchTerm 
-                ? users.filter(user => user.email.toLowerCase().includes(userSearchTerm))
-                : users;
-            
-            console.log(`After filtering: ${filteredUsers.length} users match search criteria`);
-            
-            if (filteredUsers.length === 0) {
-                userListEl.innerHTML = '<div class="no-emails">No users found</div>';
-                return;
+            // Fallback to prompt
+            const usePrompt = confirm("Would you like to enter an access token manually?");
+            if (usePrompt) {
+                const token = prompt("Enter your Gmail API access token:", "");
+                if (token) {
+                    return {
+                        email: userEmail,
+                        access_token: token
+                    };
+                }
             }
-            
-            userListEl.innerHTML = '';
-            
-            // If we still have no users, use mock data as fallback
-            if (filteredUsers.length === 0 && mockUsers && mockUsers.length > 0) {
-                console.log("Using mock users as fallback");
-                mockUsers.forEach(createUserCard);
-                return;
-            }
-            
-            filteredUsers.forEach(createUserCard);
+        } else {
+            alert(`Error accessing authentication data: ${err.message}`);
         }
         
-        function createUserCard(user) {
+        return null;
+    }
+}
+            
+            // Functions - User List
+            async function fetchUsers() {
+                try {
+                    console.log("Starting fetchUsers function");
+                    
+                    // Make sure elements exist before accessing them
+                    if (!loadingUsersEl || !userListEl || !errorUsersEl) {
+                        console.error("DOM elements not found, retrying in 500ms");
+                        setTimeout(fetchUsers, 500);
+                        return;
+                    }
+                    
+                    loadingUsersEl.style.display = 'flex';
+                    userListEl.style.display = 'none';
+                    errorUsersEl.style.display = 'none';
+                    
+                    console.log("Querying Firestore for users with third-party app emails");
+                    
+                    // Get distinct users who have emails with third-party apps
+                    const emailsRef = db.collection('emails')
+                        .where('has_third_party_apps', '==', true)
+                        .limit(100);
+                    
+                    console.log("Awaiting Firestore results...");
+                    const snapshot = await emailsRef.get();
+                    console.log(`Received ${snapshot.size} documents from Firestore`);
+                    
+                    // Extract unique user emails and count their emails with third-party apps
+                    const userEmailMap = {};
+                    
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const userEmail = data.user_email;
+                        
+                        if (userEmail) {
+                            if (!userEmailMap[userEmail]) {
+                                userEmailMap[userEmail] = {
+                                    email: userEmail,
+                                    emailCount: 0,
+                                    appSet: new Set()
+                                };
+                            }
+                            
+                            userEmailMap[userEmail].emailCount++;
+                            
+                            // Track unique apps for this user
+                            if (data.detected_apps && Array.isArray(data.detected_apps)) {
+                                data.detected_apps.forEach(app => {
+                                    userEmailMap[userEmail].appSet.add(app);
+                                });
+                            }
+                        }
+                    });
+                    
+                    // Convert to array and sort by email count (descending)
+                    users = Object.values(userEmailMap).map(user => ({
+                        email: user.email,
+                        emailCount: user.emailCount,
+                        uniqueAppCount: user.appSet.size
+                    }));
+                    
+                    users.sort((a, b) => b.emailCount - a.emailCount);
+                    
+                    console.log(`Processed ${users.length} unique users with third-party app emails`);
+                    
+                    if (users.length === 0) {
+                        console.log("No users found, showing error message");
+                        errorUsersEl.style.display = 'flex';
+                        errorUsersEl.textContent = "No users with third-party app emails found";
+                        loadingUsersEl.style.display = 'none';
+                        return;
+                    }
+                    
+                    // In case there are mock users available for testing
+                    if (users.length === 0 && typeof mockUsers !== 'undefined' && mockUsers.length > 0) {
+                        console.log("Using mock user data for testing");
+                        users = mockUsers;
+                    }
+                    
+                    console.log("Rendering user list");
+                    renderUserList();
+                    
+                    loadingUsersEl.style.display = 'none';
+                    userListEl.style.display = 'grid';
+                    console.log("User list displayed");
+                } catch (err) {
+                    console.error("Error fetching users:", err);
+                    loadingUsersEl.style.display = 'none';
+                    errorUsersEl.style.display = 'flex';
+                    errorUsersEl.textContent = "Failed to load users: " + err.message;
+                }
+            }
+            
+            function renderUserList() {
+                console.log(`Rendering user list with ${users.length} users`);
+                
+                // Filter users by search term if provided
+                const filteredUsers = userSearchTerm 
+                    ? users.filter(user => user.email.toLowerCase().includes(userSearchTerm))
+                    : users;
+                
+                console.log(`After filtering: ${filteredUsers.length} users match search criteria`);
+                
+                if (filteredUsers.length === 0) {
+                    userListEl.innerHTML = '<div class="no-emails">No users found</div>';
+                    return;
+                }
+                
+                userListEl.innerHTML = '';
+                
+                // If we still have no users, use mock data as fallback
+                if (filteredUsers.length === 0 && mockUsers && mockUsers.length > 0) {
+                    console.log("Using mock users as fallback");
+                    mockUsers.forEach(createUserCard);
+                    return;
+                }
+                
+                filteredUsers.forEach(createUserCard);
+            }
+            
+            function createUserCard(user) {
                 const userCardEl = document.createElement('div');
                 userCardEl.className = 'user-card';
                 
@@ -757,315 +853,557 @@
                 });
                 
                 userListEl.appendChild(userCardEl);
-            
-        };
-        
-        // Functions - Email View
-        async function fetchEmails(userEmail) {
-            console.log(`Fetching emails for user: ${userEmail}`);
-            if (!userEmail) {
-                console.error("No user email provided");
-                return;
             }
             
-            try {
-                loadingEl.style.display = 'flex';
-                emailContainerEl.style.display = 'none';
-                errorEl.style.display = 'none';
-                
-                // Check if we should use mock data (for testing or if Firebase fails)
-                const useMockData = location.search.includes('mock=true') || 
-                                   localStorage.getItem('useMockData') === 'true';
-                
-                if (useMockData) {
-                    console.log("Using mock email data");
-                    setTimeout(() => {
-                        emails = mockEmails;
-                        updateStats();
-                        updateAppTags();
-                        updateFilterOptions();
-                        renderEmailList();
-                        
-                        loadingEl.style.display = 'none';
-                        emailContainerEl.style.display = 'grid';
-                    }, 500);
+            // Functions - Email View
+            async function fetchEmails(userEmail) {
+                console.log(`Fetching emails for user: ${userEmail}`);
+                if (!userEmail) {
+                    console.error("No user email provided");
                     return;
                 }
                 
-                console.log("Querying Firestore for emails");
-                // Filter emails by user email
-                const emailsRef = db.collection('emails')
-                    .where('user_email', '==', userEmail)
-                    .where('has_third_party_apps', '==', true)
-                    .limit(100);
-                
-                console.log("Awaiting Firestore results...");
-                const snapshot = await emailsRef.get();
-                console.log(`Received ${snapshot.size} emails from Firestore`);
-                
-                emails = [];
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    emails.push({
-                        id: doc.id,
-                        subject: data.subject || 'No Subject',
-                        sender: data.sender || 'Unknown Sender',
-                        body: data.body || '',
-                        apps: data.detected_apps || [],
-                        timestamp: data.created_at ? 
-                            (typeof data.created_at.toDate === 'function' ? data.created_at.toDate() : new Date(data.created_at)) 
-                            : new Date()
-                    });
-                });
-                
-                if (emails.length === 0) {
-                    errorEl.style.display = 'flex';
-                    errorEl.textContent = `No emails with third-party apps found for ${userEmail}`;
-                    loadingEl.style.display = 'none';
-                    return;
-                }
-                
-                updateStats();
-                updateAppTags();
-                updateFilterOptions();
-                renderEmailList();
-                
-                loadingEl.style.display = 'none';
-                emailContainerEl.style.display = 'grid';
-            } catch (err) {
-                console.error("Error fetching emails:", err);
-                loadingEl.style.display = 'none';
-                errorEl.style.display = 'flex';
-                errorEl.textContent = "Failed to load emails: " + err.message;
-            }
-        }
-        
-        function updateStats() {
-            const totalEmails = emails.length;
-            
-            // Count unique apps
-            const allApps = emails.flatMap(email => email.apps);
-            const uniqueApps = [...new Set(allApps)];
-            
-            // Find most common app
-            const appCounts = {};
-            allApps.forEach(app => {
-                appCounts[app] = (appCounts[app] || 0) + 1;
-            });
-            
-            let mostCommonApp = '-';
-            let maxCount = 0;
-            
-            Object.entries(appCounts).forEach(([app, count]) => {
-                if (count > maxCount) {
-                    mostCommonApp = app;
-                    maxCount = count;
-                }
-            });
-            
-            totalEmailsEl.textContent = totalEmails;
-            uniqueAppsEl.textContent = uniqueApps.length;
-            mostCommonAppEl.textContent = mostCommonApp !== '-' ? mostCommonApp : '-';
-        }
-        
-        function updateAppTags() {
-            // Get all unique apps
-            const allApps = emails.flatMap(email => email.apps);
-            const uniqueApps = [...new Set(allApps)];
-            
-            // Count occurrences
-            const appCounts = {};
-            allApps.forEach(app => {
-                appCounts[app] = (appCounts[app] || 0) + 1;
-            });
-            
-            // Sort by occurrence count
-            const sortedApps = uniqueApps.sort((a, b) => appCounts[b] - appCounts[a]);
-            
-            // Take top 10
-            const topApps = sortedApps.slice(0, 10);
-            
-            // Create app tags
-            appTagsEl.innerHTML = '';
-            topApps.forEach(app => {
-                const tagEl = document.createElement('div');
-                tagEl.className = `app-tag ${app === selectedAppTag ? 'selected' : ''}`;
-                tagEl.textContent = `${app} (${appCounts[app]})`;
-                
-                tagEl.addEventListener('click', () => {
-                    if (selectedAppTag === app) {
-                        // Deselect if already selected
-                        selectedAppTag = null;
-                        filterValue = 'all';
-                        filterSelectEl.value = 'all';
-                    } else {
-                        // Select this app
-                        selectedAppTag = app;
-                        filterValue = app;
+                try {
+                    loadingEl.style.display = 'flex';
+                    emailContainerEl.style.display = 'none';
+                    errorEl.style.display = 'none';
+                    
+                    // Check if we should use mock data (for testing or if Firebase fails)
+                    const useMockData = location.search.includes('mock=true') || 
+                                      localStorage.getItem('useMockData') === 'true';
+                    
+                    if (useMockData) {
+                        console.log("Using mock email data");
+                        setTimeout(() => {
+                            emails = [...mockEmails]; // Create a copy
+                            updateStats();
+                            updateAppTags();
+                            updateFilterOptions();
+                            renderEmailList();
+                            
+                            loadingEl.style.display = 'none';
+                            emailContainerEl.style.display = 'grid';
+                        }, 500);
+                        return;
                     }
                     
-                    updateAppTagSelection();
+                    console.log("Querying Firestore for emails");
+                    // Filter emails by user email
+                    const emailsRef = db.collection('emails')
+                        .where('user_email', '==', userEmail)
+                        .where('has_third_party_apps', '==', true)
+                        .limit(100);
+                    
+                    console.log("Awaiting Firestore results...");
+                    const snapshot = await emailsRef.get();
+                    console.log(`Received ${snapshot.size} emails from Firestore`);
+                    
+                    emails = [];
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        emails.push({
+                            id: doc.id,
+                            messageId: data.email_id || '', // Using email_id as messageId
+                            subject: data.subject || 'No Subject',
+                            sender: data.sender || 'Unknown Sender',
+                            body: data.body || '',
+                            apps: data.detected_apps || [],
+                            timestamp: data.created_at ? 
+                                (typeof data.created_at.toDate === 'function' ? data.created_at.toDate() : new Date(data.created_at)) 
+                                : new Date()
+                        });
+                    });
+                    
+                    if (emails.length === 0) {
+                        errorEl.style.display = 'flex';
+                        errorEl.textContent = `No emails with third-party apps found for ${userEmail}`;
+                        loadingEl.style.display = 'none';
+                        return;
+                    }
+                    
+                    updateStats();
+                    updateAppTags();
+                    updateFilterOptions();
                     renderEmailList();
+                    
+                    loadingEl.style.display = 'none';
+                    emailContainerEl.style.display = 'grid';
+                } catch (err) {
+                    console.error("Error fetching emails:", err);
+                    loadingEl.style.display = 'none';
+                    errorEl.style.display = 'flex';
+                    errorEl.textContent = "Failed to load emails: " + err.message;
+                }
+            }
+            
+            function updateStats() {
+                const totalEmails = emails.length;
+                
+                // Count unique apps
+                const allApps = emails.flatMap(email => email.apps);
+                const uniqueApps = [...new Set(allApps)];
+                
+                // Find most common app
+                const appCounts = {};
+                allApps.forEach(app => {
+                    appCounts[app] = (appCounts[app] || 0) + 1;
                 });
                 
-                appTagsEl.appendChild(tagEl);
-            });
-        }
-        
-        function updateAppTagSelection() {
-            // Update visual selection of app tags
-            const tagElements = appTagsEl.querySelectorAll('.app-tag');
-            tagElements.forEach(tag => {
-                const appName = tag.textContent.split(' (')[0];
-                if (appName === selectedAppTag) {
-                    tag.classList.add('selected');
-                } else {
-                    tag.classList.remove('selected');
-                }
-            });
-        }
-        
-        function updateFilterOptions() {
-            // Get all unique apps for the filter dropdown
-            const allApps = emails.flatMap(email => email.apps);
-            const uniqueApps = [...new Set(allApps)].sort();
-            
-            // Clear existing options (except 'All Apps')
-            while (filterSelectEl.options.length > 1) {
-                filterSelectEl.remove(1);
+                let mostCommonApp = '-';
+                let maxCount = 0;
+                
+                Object.entries(appCounts).forEach(([app, count]) => {
+                    if (count > maxCount) {
+                        mostCommonApp = app;
+                        maxCount = count;
+                    }
+                });
+                
+                totalEmailsEl.textContent = totalEmails;
+                uniqueAppsEl.textContent = uniqueApps.length;
+                mostCommonAppEl.textContent = mostCommonApp !== '-' ? mostCommonApp : '-';
             }
             
-            // Add app options
-            uniqueApps.forEach(app => {
-                const option = document.createElement('option');
-                option.value = app;
-                option.textContent = app;
-                filterSelectEl.appendChild(option);
-            });
-        }
-        
-        function filterEmails() {
-            return emails.filter(email => {
-                // Apply app filter
-                if (filterValue !== 'all' && !email.apps.includes(filterValue)) {
-                    return false;
-                }
+            function updateAppTags() {
+                // Get all unique apps
+                const allApps = emails.flatMap(email => email.apps);
+                const uniqueApps = [...new Set(allApps)];
                 
-                // Apply search term
-                if (searchTerm) {
-                    const hasMatchingSubject = email.subject.toLowerCase().includes(searchTerm);
-                    const hasMatchingSender = email.sender.toLowerCase().includes(searchTerm);
-                    const hasMatchingBody = email.body.toLowerCase().includes(searchTerm);
-                    const hasMatchingApp = email.apps.some(app => app.toLowerCase().includes(searchTerm));
+                // Count occurrences
+                const appCounts = {};
+                allApps.forEach(app => {
+                    appCounts[app] = (appCounts[app] || 0) + 1;
+                });
+                
+                // Sort by occurrence count
+                const sortedApps = uniqueApps.sort((a, b) => appCounts[b] - appCounts[a]);
+                
+                // Take top 10
+                const topApps = sortedApps.slice(0, 10);
+                
+                // Create app tags
+                appTagsEl.innerHTML = '';
+                topApps.forEach(app => {
+                    const tagEl = document.createElement('div');
+                    tagEl.className = `app-tag ${app === selectedAppTag ? 'selected' : ''}`;
+                    tagEl.textContent = `${app} (${appCounts[app]})`;
                     
-                    return hasMatchingSubject || hasMatchingSender || hasMatchingBody || hasMatchingApp;
-                }
-                
-                return true;
-            });
-        }
-        
-        function renderEmailList() {
-            const filteredEmails = filterEmails();
-            
-            if (filteredEmails.length === 0) {
-                emailListEl.innerHTML = '<div class="no-emails">No emails found</div>';
-                emailDetailEl.innerHTML = '<div class="no-email-selected">No emails match your filters</div>';
-                return;
+                    tagEl.addEventListener('click', () => {
+                        if (selectedAppTag === app) {
+                            // Deselect if already selected
+                            selectedAppTag = null;
+                            filterValue = 'all';
+                            filterSelectEl.value = 'all';
+                        } else {
+                            // Select this app
+                            selectedAppTag = app;
+                            filterValue = app;
+                        }
+                        
+                        updateAppTagSelection();
+                        renderEmailList();
+                    });
+                    
+                    appTagsEl.appendChild(tagEl);
+                });
             }
             
-            emailListEl.innerHTML = '';
+            function updateAppTagSelection() {
+                // Update visual selection of app tags
+                const tagElements = appTagsEl.querySelectorAll('.app-tag');
+                tagElements.forEach(tag => {
+                    const appName = tag.textContent.split(' (')[0];
+                    if (appName === selectedAppTag) {
+                        tag.classList.add('selected');
+                    } else {
+                        tag.classList.remove('selected');
+                    }
+                });
+            }
             
-            filteredEmails.forEach(email => {
-                const emailItemEl = document.createElement('div');
-                emailItemEl.className = `email-item ${email.id === selectedEmailId ? 'selected' : ''}`;
+            function updateFilterOptions() {
+                // Get all unique apps for the filter dropdown
+                const allApps = emails.flatMap(email => email.apps);
+                const uniqueApps = [...new Set(allApps)].sort();
+                
+                // Clear existing options (except 'All Apps')
+                while (filterSelectEl.options.length > 1) {
+                    filterSelectEl.remove(1);
+                }
+                
+                // Add app options
+                uniqueApps.forEach(app => {
+                    const option = document.createElement('option');
+                    option.value = app;
+                    option.textContent = app;
+                    filterSelectEl.appendChild(option);
+                });
+            }
+            
+            function filterEmails() {
+                return emails.filter(email => {
+                    // Apply app filter
+                    if (filterValue !== 'all' && !email.apps.includes(filterValue)) {
+                        return false;
+                    }
+                    
+                    // Apply search term
+                    if (searchTerm) {
+                        const hasMatchingSubject = email.subject.toLowerCase().includes(searchTerm);
+                        const hasMatchingSender = email.sender.toLowerCase().includes(searchTerm);
+                        const hasMatchingBody = email.body.toLowerCase().includes(searchTerm);
+                        const hasMatchingApp = email.apps.some(app => app.toLowerCase().includes(searchTerm));
+                        
+                        return hasMatchingSubject || hasMatchingSender || hasMatchingBody || hasMatchingApp;
+                    }
+                    
+                    return true;
+                });
+            }
+        
+            async function deleteEmailFromGmail(messageId) {
+                if (!selectedUserData || !selectedUserData.access_token) {
+                    console.log("No access token available for this user");
+                    return { success: false, error: "No access token available" };
+                }
+                
+                try {
+                    console.log(`Deleting email with message ID: ${messageId}`);
+                    
+                    // For test purposes, simulate success if no message ID
+                    if (!messageId || messageId.trim() === '') {
+                        console.log("No message ID provided, simulating success");
+                        return { success: true, data: { id: "simulated_" + Date.now() } };
+                    }
+                    console.log("hii");
+                    console.log(selectedUserData.access_token);
+
+                    const response = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/messages/${messageId}/trash`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${selectedUserData.access_token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error("Gmail API Error:", errorData);
+                        
+                        // Check if token is expired (401 Unauthorized)
+                        
+                        if (response.status === 401) {
+                            console.log("token is")
+                            console.log(selectedUserData.access_token)
+                            alert("Access token is invalid or expired. Please provide a new token.");
+                            
+                            // Ask for a new token
+                            const newToken = prompt("Your access token is invalid. Please provide a new Gmail API access token:", "");
+                            if (newToken) {
+                                selectedUserData.access_token = newToken;
+                                // Retry with new token
+                                return deleteEmailFromGmail(messageId);
+                            } else {
+                                return { success: false, error: "Authorization failed and no new token provided" };
+                            }
+                        }
+                        
+                        return { 
+                            success: false, 
+                            error: errorData.error ? errorData.error.message : "Unknown API error" 
+                        };
+                    }
+                    
+                    const data = await response.json();
+                    console.log("Gmail API Response:", data);
+                    
+                    return { success: true, data };
+                } catch (err) {
+                    console.error("Error deleting email:", err);
+                    return { success: false, error: err.message };
+                }
+            }
+        
+            async function deleteAllEmails() {
+                // Show confirmation dialog
+                if (!confirm("Are you sure you want to delete ALL emails with third-party apps? This action cannot be undone.")) {
+                    return;
+                }
+                
+                // Check for token
+                if (!selectedUserData || !selectedUserData.access_token) {
+                    console.log("No access token available");
+                    
+                    const token = prompt("Please enter your Gmail API access token to delete emails:", "");
+                    if (!token) {
+                        alert("Cannot delete emails without an access token.");
+                        return;
+                    }
+                    
+                    selectedUserData = {
+                        email: selectedUserEmail,
+                        access_token: token
+                    };
+                }
+                
+                // Filter only deletable emails (ones with message IDs)
+                const emailsToDelete = emails.filter(email => email.messageId);
+                
+                if (emailsToDelete.length === 0) {
+                    alert("No emails with message IDs found. Cannot delete emails.");
+                    return;
+                }
+                
+                const totalToDelete = emailsToDelete.length;
+                let successCount = 0;
+                let failureCount = 0;
+                
+                // Show progress notification
+                console.log(`Deleting ${totalToDelete} emails...`);
+                
+                // Create a progress indicator
+                const progressContainer = document.createElement('div');
+                progressContainer.id = 'delete-progress';
+                progressContainer.style.position = 'fixed';
+                progressContainer.style.top = '50%';
+                progressContainer.style.left = '50%';
+                progressContainer.style.transform = 'translate(-50%, -50%)';
+                progressContainer.style.backgroundColor = 'white';
+                progressContainer.style.padding = '20px';
+                progressContainer.style.borderRadius = '8px';
+                progressContainer.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.2)';
+                progressContainer.style.zIndex = '2000';
+                progressContainer.innerHTML = `
+                    <h3>Deleting Emails</h3>
+                    <div>Progress: <span id="delete-progress-count">0</span> / ${totalToDelete}</div>
+                    <div style="margin-top: 15px;">Please don't close this window</div>
+                `;
+                document.body.appendChild(progressContainer);
+                
+                // Get progress count element
+                const progressCountEl = document.getElementById('delete-progress-count');
+                
+                // Process emails in batches of 5 to avoid rate limits
+                const batchSize = 5;
+                
+                for (let i = 0; i < emailsToDelete.length; i += batchSize) {
+                    // Get current batch
+                    const batch = emailsToDelete.slice(i, i + batchSize);
+                    
+                    // Process batch in parallel
+                    const results = await Promise.all(
+                        batch.map(async (email) => {
+                            const result = await deleteEmailFromGmail(email.messageId);
+                            
+                            if (result.success) {
+                                // Update Firestore to mark as deleted
+                                try {
+                                    const emailRef = db.collection('emails').doc(email.id);
+                                    await emailRef.update({
+                                        deleted: true,
+                                        deleted_at: new Date()
+                                    });
+                                } catch (err) {
+                                    console.error(`Error updating Firestore for email ${email.id}:`, err);
+                                }
+                                
+                                return { success: true, id: email.id };
+                            } else {
+                                return { success: false, id: email.id, error: result.error };
+                            }
+                        })
+                    );
+                    
+                    // Update counts
+                    results.forEach(result => {
+                        if (result.success) {
+                            successCount++;
+                        } else {
+                            failureCount++;
+                        }
+                    });
+                    
+                    // Update progress
+                    progressCountEl.textContent = successCount;
+                    
+                    // Wait a bit between batches to avoid rate limits
+                    if (i + batchSize < emailsToDelete.length) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                }
+                
+                // Remove progress indicator
+                progressContainer.remove();
+                
+                // Show completion toast
+                if (failureCount === 0) {
+                    alert(`Successfully deleted ${successCount} emails`);
+                } else {
+                    alert(`Deleted ${successCount} emails, ${failureCount} failed`);
+                }
+                
+                // Reload the email list if any were deleted
+                if (successCount > 0) {
+                    fetchEmails(selectedUserEmail);
+                }
+            }
+            
+            function renderEmailList() {
+                const filteredEmails = filterEmails();
+                
+                if (filteredEmails.length === 0) {
+                    emailListEl.innerHTML = '<div class="no-emails">No emails found</div>';
+                    emailDetailEl.innerHTML = '<div class="no-email-selected">No emails match your filters</div>';
+                    return;
+                }
+                
+                emailListEl.innerHTML = '';
+                
+                filteredEmails.forEach(email => {
+                    const emailItemEl = document.createElement('div');
+                    emailItemEl.className = `email-item ${email.id === selectedEmailId ? 'selected' : ''}`;
+                    
+                    // Create app tags HTML
+                    const appTagsHtml = email.apps.map(app => 
+                        `<span class="email-app-tag">${app}</span>`
+                    ).join('');
+                    
+                    emailItemEl.innerHTML = `
+                        <div class="email-sender">${email.sender}</div>
+                        <div class="email-subject">${email.subject}</div>
+                        <div class="email-apps">${appTagsHtml}</div>
+                    `;
+                    
+                    emailItemEl.addEventListener('click', () => {
+                        selectEmail(email);
+                    });
+                    
+                    emailListEl.appendChild(emailItemEl);
+                });
+                
+                // If no email is selected but we have emails, select the first one
+                if (!selectedEmailId && filteredEmails.length > 0) {
+                    selectEmail(filteredEmails[0]);
+                } else if (selectedEmailId) {
+                    // Check if selected email is still in filtered list
+                    const isSelectedEmailInList = filteredEmails.some(email => email.id === selectedEmailId);
+                    if (!isSelectedEmailInList && filteredEmails.length > 0) {
+                        selectEmail(filteredEmails[0]);
+                    } else if (!isSelectedEmailInList) {
+                        emailDetailEl.innerHTML = '<div class="no-email-selected">No emails match your filters</div>';
+                    }
+                }
+            }
+            
+            function selectEmail(email) {
+                selectedEmailId = email.id;
+                
+                // Update visual selection
+                const emailItems = emailListEl.querySelectorAll('.email-item');
+                emailItems.forEach(item => {
+                    item.classList.remove('selected');
+                    if (item.querySelector('.email-subject').textContent === email.subject) {
+                        item.classList.add('selected');
+                    }
+                });
                 
                 // Create app tags HTML
                 const appTagsHtml = email.apps.map(app => 
-                    `<span class="email-app-tag">${app}</span>`
+                    `<div class="email-detail-app">${app}</div>`
                 ).join('');
                 
-                emailItemEl.innerHTML = `
-                    <div class="email-sender">${email.sender}</div>
-                    <div class="email-subject">${email.subject}</div>
-                    <div class="email-apps">${appTagsHtml}</div>
-                `;
+                // Format date
+                const formattedDate = email.timestamp ? email.timestamp.toLocaleString() : 'Unknown date';
                 
-                emailItemEl.addEventListener('click', () => {
-                    selectEmail(email);
-                });
-                
-                emailListEl.appendChild(emailItemEl);
-            });
-            
-            // If no email is selected but we have emails, select the first one
-            if (!selectedEmailId && filteredEmails.length > 0) {
-                selectEmail(filteredEmails[0]);
-                            } else if (selectedEmailId) {
-                // Check if selected email is still in filtered list
-                const isSelectedEmailInList = filteredEmails.some(email => email.id === selectedEmailId);
-                if (!isSelectedEmailInList && filteredEmails.length > 0) {
-                    selectEmail(filteredEmails[0]);
-                } else if (!isSelectedEmailInList) {
-                    emailDetailEl.innerHTML = '<div class="no-email-selected">No emails match your filters</div>';
-                }
-            }
-        }
+                // Sanitize and format email body
+                const sanitizedBody = email.body
+                    ? email.body.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>")
+                    : "No content";
         
-        function selectEmail(email) {
-            selectedEmailId = email.id;
-            
-            // Update visual selection
-            const emailItems = emailListEl.querySelectorAll('.email-item');
-            emailItems.forEach(item => {
-                item.classList.remove('selected');
-                if (item.querySelector('.email-subject').textContent === email.subject) {
-                    item.classList.add('selected');
-                }
-            });
-            
-            // Create app tags HTML
-            const appTagsHtml = email.apps.map(app => 
-                `<div class="email-detail-app">${app}</div>`
-            ).join('');
-            
-            // Format date
-            const formattedDate = email.timestamp ? email.timestamp.toLocaleString() : 'Unknown date';
-            
-            // Sanitize and format email body
-            const sanitizedBody = email.body
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/\n/g, "<br>");
-            
-            emailDetailEl.innerHTML = `
-                <div class="email-detail-header">
-                    <div class="email-detail-subject">${email.subject}</div>
-                    <div class="email-detail-metadata">
-                        <div>From: ${email.sender}</div>
-                        <div>Date: ${formattedDate}</div>
-                    </div>
-                    <div class="email-detail-apps">
-                        <div class="email-detail-apps-title">Detected Third-Party Apps:</div>
-                        <div class="email-detail-apps-list">
-                            ${appTagsHtml}
+                // Show message ID for debugging purposes 
+                const messageIdInfo = email.messageId ? 
+                    `<div style="margin-top:5px; font-size:11px; color:#888;">Message ID: ${email.messageId}</div>` : 
+                    `<div style="margin-top:5px; font-size:11px; color:#ea4335;">No Message ID (Cannot Delete)</div>`;
+                
+                emailDetailEl.innerHTML = `
+                    <div class="email-detail-header">
+                        <div class="email-detail-subject">${email.subject}</div>
+                        <div class="email-detail-metadata">
+                            <div>From: ${email.sender}</div>
+                            <div>Date: ${formattedDate}</div>
+                            ${messageIdInfo}
+                        </div>
+                        <div class="email-detail-apps">
+                            <div class="email-detail-apps-title">Detected Third-Party Apps:</div>
+                            <div class="email-detail-apps-list">
+                                ${appTagsHtml}
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="email-detail-content">${sanitizedBody}</div>
-            `;
-        }
-        
-        // Initialize: Start by fetching users
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("DOM loaded, fetching users...");
-            fetchUsers();
-        });
-        
-        // Also call it immediately in case the DOM is already loaded
-        if (document.readyState === 'complete' || document.readyState === 'interactive') {
-            console.log("Document already ready, fetching users now...");
-            fetchUsers();
-
-        }
+                    <div class="email-detail-content">${sanitizedBody}</div>
+                `;
+            }
+            
+            // Add CSS for delete button if not already in the HTML
+            if (!document.querySelector('style#delete-button-style')) {
+                const styleEl = document.createElement('style');
+                styleEl.id = 'delete-button-style';
+                styleEl.textContent = `
+                    .delete-button {
+                        padding: 8px 16px;
+                        border: none;
+                        border-radius: 4px;
+                        background-color: #ea4335;
+                        color: white;
+                        font-size: 14px;
+                        cursor: pointer;
+                        transition: background-color 0.2s;
+                    }
+                    
+                    .delete-button:hover {
+                        background-color: #d73125;
+                    }
+                    
+                    .delete-button:disabled {
+                        background-color: #f5a5a0;
+                cursor: not-allowed;
+            }
+            
+            /* Progress container styling */
+            #delete-progress {
+                padding: 25px;
+                background-color: white;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                text-align: center;
+                min-width: 300px;
+            }
+            
+            #delete-progress h3 {
+                margin-top: 0;
+                margin-bottom: 15px;
+                color: #333;
+            }
+            
+            #delete-progress-count {
+                font-weight: bold;
+                color: #4285f4;
+            }
+        `;
+        document.head.appendChild(styleEl);
+    }
+    
+    // Initialize: Start by fetching users
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM loaded, fetching users...");
+        fetchUsers();
+    });
+    
+    // Also call it immediately in case the DOM is already loaded
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        console.log("Document already ready, fetching users now...");
+        fetchUsers();
+    }
 </script>
