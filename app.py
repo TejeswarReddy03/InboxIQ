@@ -11,6 +11,10 @@ from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, firestore
 import datetime
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)  # Enables CORS for all routes
 
 load_dotenv()
 
