@@ -10,6 +10,7 @@ import os
 from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, firestore
+import datetime
 
 load_dotenv()
 
@@ -26,10 +27,7 @@ AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 REGION_NAME = os.getenv("REGION_NAME")
 
-
-
 MODEL_ID = os.getenv("MODEL_ID")
-
 
 bedrock = boto3.client(
     service_name="bedrock-runtime",
@@ -38,9 +36,7 @@ bedrock = boto3.client(
     aws_secret_access_key=AWS_SECRET_ACCESS_KEY
 )
 
-
 MODEL_ID = "anthropic.claude-3-5-sonnet-20240620-v1:0"
-
 
 def initialize_firebase():
     """Initialize Firebase connection"""
@@ -79,7 +75,7 @@ def login():
         "&redirect_uri=http://127.0.0.1:5000/auth/callback"
         "&scope=openid%20email%20profile%20https://mail.google.com/"
         "&access_type=offline"
-    "&prompt=consent"
+        "&prompt=consent"
     )
     return redirect(google_auth_url)
 
@@ -98,6 +94,9 @@ def auth_callback():
     token_response = requests.post(token_url, data=token_data)
     token_json = token_response.json()
     access_token = token_json.get("access_token")
+    refresh_token = token_json.get("refresh_token")  # Also capture the refresh token if available
+    token_expiry = token_json.get("expires_in")  # Get token expiration time
+    
     print(access_token)
 
     if not access_token:
@@ -110,16 +109,126 @@ def auth_callback():
 
     if not email:
         return "Failed to retrieve user email."
+    
+    current_time = datetime.datetime.now()
+    expiry_time = None
+    
+    if token_expiry:
+        expiry_time = current_time + datetime.timedelta(seconds=int(token_expiry))
 
     user_ref = db.collection('users').document(email)
-    user_ref.set({
-        'email': email
-    }, merge=True)  
+    user_data = {
+        'email': email,
+        'access_token': access_token,
+        'token_updated_at': firestore.SERVER_TIMESTAMP,
+    }
+    
+    if refresh_token:
+        user_data['refresh_token'] = refresh_token
+    
+    if expiry_time:
+        user_data['token_expires_at'] = expiry_time
+    
+    user_ref.set(user_data, merge=True)
 
     session["email"] = email
     session["access_token"] = access_token
 
     return redirect(url_for("dashboard"))
+
+def get_user_access_token(email):
+    """
+    Retrieve the access token for a user from Firestore.
+    If token is expired, try to refresh it.
+    
+    Args:
+        email (str): User's email address
+        
+    Returns:
+        str: Valid access token or None if not available
+    """
+    try:
+        user_ref = db.collection('users').document(email)
+        user_doc = user_ref.get()
+        
+        if not user_doc.exists:
+            return None
+            
+        user_data = user_doc.to_dict()
+        access_token = user_data.get('access_token')
+        
+        # Check if token is expired
+        current_time = datetime.datetime.now()
+        expires_at = user_data.get('token_expires_at')
+        
+        if expires_at and current_time >= expires_at.replace(tzinfo=None):
+            refresh_token = user_data.get('refresh_token')
+            if refresh_token:
+                new_token = refresh_access_token(refresh_token, email)
+                if new_token:
+                    return new_token
+                    
+            return None
+            
+        return access_token
+    
+    except Exception as e:
+        print(f"Error retrieving user token: {str(e)}")
+        return None
+
+def refresh_access_token(refresh_token, email):
+    """
+    Refresh an expired access token using the refresh token.
+    
+    Args:
+        refresh_token (str): The refresh token
+        email (str): User's email to update in Firestore
+        
+    Returns:
+        str: New access token or None if refresh failed
+    """
+    try:
+        token_url = "https://oauth2.googleapis.com/token"
+        refresh_data = {
+            "client_id": GOOGLE_CLIENT_ID,
+            "client_secret": GOOGLE_CLIENT_SECRET,
+            "refresh_token": refresh_token,
+            "grant_type": "refresh_token"
+        }
+        
+        token_response = requests.post(token_url, data=refresh_data)
+        
+        if token_response.status_code != 200:
+            print(f"Failed to refresh token: {token_response.text}")
+            return None
+            
+        token_json = token_response.json()
+        new_access_token = token_json.get("access_token")
+        token_expiry = token_json.get("expires_in")
+        
+        if new_access_token and email:
+            current_time = datetime.datetime.now()
+            expiry_time = None
+            
+            if token_expiry:
+                expiry_time = current_time + datetime.timedelta(seconds=int(token_expiry))
+                
+            user_ref = db.collection('users').document(email)
+            user_data = {
+                'access_token': new_access_token,
+                'token_updated_at': firestore.SERVER_TIMESTAMP,
+            }
+            
+            if expiry_time:
+                user_data['token_expires_at'] = expiry_time
+                
+            user_ref.set(user_data, merge=True)
+        
+        return new_access_token
+        
+    except Exception as e:
+        print(f"Error refreshing token: {str(e)}")
+        return None
 
 def detect_third_party_apps(email_content):
     """
@@ -216,10 +325,21 @@ def get_email_body(msg_data):
 
 def fetch_and_store_gmail_messages():
     """Fetch and store emails from Gmail to Firestore"""
-    if "access_token" not in session:
+    if "email" not in session:
         return []
 
+    email = session.get("email")
+    
+    # Try to get token from session first
     access_token = session.get("access_token")
+    
+    # If token not in session, get from database
+    if not access_token:
+        access_token = get_user_access_token(email)
+        if access_token:
+            # Update session with the token from database
+            session["access_token"] = access_token
+    
     if not access_token:
         return []
 
@@ -229,7 +349,36 @@ def fetch_and_store_gmail_messages():
     try:
         response = requests.get(url, headers=headers)
         if response.status_code != 200:
-            return []
+            # Handle token expiration error (status 401)
+            if response.status_code == 401:
+                # Try to refresh token
+                user_ref = db.collection('users').document(email)
+                user_doc = user_ref.get()
+                
+                if user_doc.exists:
+                    user_data = user_doc.to_dict()
+                    refresh_token = user_data.get('refresh_token')
+                    
+                    if refresh_token:
+                        new_access_token = refresh_access_token(refresh_token, email)
+                        if new_access_token:
+                            # Update session
+                            session["access_token"] = new_access_token
+                            
+                            # Try request again with new token
+                            headers = {"Authorization": f"Bearer {new_access_token}"}
+                            response = requests.get(url, headers=headers)
+                            
+                            if response.status_code != 200:
+                                return []
+                        else:
+                            return []
+                    else:
+                        return []
+                else:
+                    return []
+            else:
+                return []
 
         response_json = response.json()
         messages = response_json.get("messages", [])
