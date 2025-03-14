@@ -57,6 +57,22 @@
             font-size: 14px;
         }
 
+        .back-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: none;
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
         .logout-button {
             padding: 8px 16px;
             border: none;
@@ -304,6 +320,52 @@
             color: #ea4335;
         }
 
+        /* User list styles */
+        .user-list-container {
+            padding: 20px;
+        }
+
+        .user-list-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .user-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .user-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .user-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .user-card-email {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #4285f4;
+        }
+
+        .user-card-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
         @media (max-width: 768px) {
             .email-container {
                 grid-template-columns: 1fr;
@@ -332,6 +394,10 @@
                 width: 100%;
                 margin-bottom: 10px;
             }
+
+            .user-list {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -341,55 +407,110 @@
             <div class="dashboard-header">
                 <div class="dashboard-title">Third-Party App Email Dashboard</div>
                 <div class="user-info">
-                    <span class="user-email" id="user-email">user@example.com</span>
+                    <span class="user-email" id="user-email">Select a user</span>
+                    <button id="back-button" class="back-button">Back to Users</button>
                     <a href="/logout" class="logout-button">Logout</a>
                 </div>
             </div>
 
-            <div class="dashboard-controls">
-                <input type="text" id="search-input" class="search-input" placeholder="Search emails or apps...">
-                <select id="filter-select" class="filter-select">
-                    <option value="all">All Apps</option>
-                    <!-- App options will be dynamically added here -->
-                </select>
-                <button id="refresh-button" class="refresh-button">Refresh</button>
-            </div>
+            <!-- User List View -->
+            <div id="user-list-view">
+                <div class="dashboard-controls">
+                    <input type="text" id="user-search-input" class="search-input" placeholder="Search users...">
+                    <button id="refresh-users-button" class="refresh-button">Refresh</button>
+                </div>
 
-            <div class="dashboard-stats">
-                <div class="stat-card">
-                    <div class="stat-label">Total Emails with 3rd Party Apps</div>
-                    <div class="stat-value" id="total-emails">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Unique 3rd Party Apps</div>
-                    <div class="stat-value" id="unique-apps">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Most Common App</div>
-                    <div class="stat-value" id="most-common-app">-</div>
+                <div class="user-list-container">
+                    <div class="user-list-title">Users with Third-Party App Emails</div>
+                    <div id="loading-users" class="loading">Loading users...</div>
+                    <div id="error-users" class="error" style="display: none;"></div>
+                    <div id="user-list" class="user-list" style="display: none;"></div>
                 </div>
             </div>
 
-            <div class="app-insights">
-                <div class="app-insights-title">Popular Third-Party Apps</div>
-                <div class="app-tags" id="app-tags">
-                    <!-- App tags will be dynamically added here -->
+            <!-- Email View (initially hidden) -->
+            <div id="email-view" style="display: none;">
+                <div class="dashboard-controls">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search emails or apps...">
+                    <select id="filter-select" class="filter-select">
+                        <option value="all">All Apps</option>
+                        <!-- App options will be dynamically added here -->
+                    </select>
+                    <button id="refresh-button" class="refresh-button">Refresh</button>
                 </div>
-            </div>
 
-            <div id="loading" class="loading">Loading emails...</div>
-            <div id="error" class="error" style="display: none;"></div>
-            
-            <div id="email-container" class="email-container" style="display: none;">
-                <div id="email-list" class="email-list"></div>
-                <div id="email-detail" class="email-detail">
-                    <div class="no-email-selected">Select an email to view its contents</div>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Emails with 3rd Party Apps</div>
+                        <div class="stat-value" id="total-emails">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Unique 3rd Party Apps</div>
+                        <div class="stat-value" id="unique-apps">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Most Common App</div>
+                        <div class="stat-value" id="most-common-app">-</div>
+                    </div>
+                </div>
+
+                <div class="app-insights">
+                    <div class="app-insights-title">Popular Third-Party Apps</div>
+                    <div class="app-tags" id="app-tags">
+                        <!-- App tags will be dynamically added here -->
+                    </div>
+                </div>
+
+                <div id="loading" class="loading">Loading emails...</div>
+                <div id="error" class="error" style="display: none;"></div>
+                
+                <div id="email-container" class="email-container" style="display: none;">
+                    <div id="email-list" class="email-list"></div>
+                    <div id="email-detail" class="email-detail">
+                        <div class="no-email-selected">Select an email to view its contents</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Add mock data for testing if Firestore connection fails
+        const mockUsers = [
+            { email: "john.doe@example.com", emailCount: 12, uniqueAppCount: 5 },
+            { email: "jane.smith@example.com", emailCount: 8, uniqueAppCount: 3 },
+            { email: "robert.johnson@example.com", emailCount: 15, uniqueAppCount: 7 },
+            { email: "sarah.williams@example.com", emailCount: 6, uniqueAppCount: 2 },
+            { email: "michael.brown@example.com", emailCount: 9, uniqueAppCount: 4 }
+        ];
+        
+        const mockEmails = [
+            {
+                id: "email1",
+                subject: "Meeting with Client",
+                sender: "client@company.com",
+                body: "Let's discuss the project details tomorrow at 10 AM.",
+                apps: ["Zoom", "Calendar", "Slack"],
+                timestamp: new Date()
+            },
+            {
+                id: "email2",
+                subject: "Project Update",
+                sender: "manager@company.com",
+                body: "Please find attached the latest project report.",
+                apps: ["Dropbox", "Asana"],
+                timestamp: new Date()
+            },
+            {
+                id: "email3",
+                subject: "Invoice #1234",
+                sender: "billing@supplier.com",
+                body: "Your invoice is due in 7 days.",
+                apps: ["QuickBooks", "PayPal"],
+                timestamp: new Date()
+            }
+        ];
+    
         // Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDpp8drX0LVx-xy3YCWnqBpIg4laMmqeG4",
@@ -403,7 +524,16 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
-        // DOM Elements
+        // DOM Elements - User List View
+        const userListViewEl = document.getElementById('user-list-view');
+        const userListEl = document.getElementById('user-list');
+        const loadingUsersEl = document.getElementById('loading-users');
+        const errorUsersEl = document.getElementById('error-users');
+        const userSearchInputEl = document.getElementById('user-search-input');
+        const refreshUsersButtonEl = document.getElementById('refresh-users-button');
+
+        // DOM Elements - Email View
+        const emailViewEl = document.getElementById('email-view');
         const loadingEl = document.getElementById('loading');
         const errorEl = document.getElementById('error');
         const emailContainerEl = document.getElementById('email-container');
@@ -417,49 +547,32 @@
         const mostCommonAppEl = document.getElementById('most-common-app');
         const appTagsEl = document.getElementById('app-tags');
         const userEmailEl = document.getElementById('user-email');
+        const backButtonEl = document.getElementById('back-button');
         
         // State
+        let users = [];
+        let userSearchTerm = '';
+        let selectedUserEmail = null;
+        
         let emails = [];
         let selectedEmailId = null;
         let searchTerm = '';
         let filterValue = 'all';
         let selectedAppTag = null;
-        let currentUserEmail = ''; // Will be set on load
         
-        // Fetch user email from URL or session
-        function loadUserInfo() {
-            // Method 1: Get from URL parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const emailParam = urlParams.get('email');
-            
-            if (emailParam) {
-                currentUserEmail = emailParam;
-                userEmailEl.textContent = emailParam;
-                return true;
-            }
-            
-            // Method 2: Try to get from local storage
-            const storedEmail = localStorage.getItem('userEmail');
-            if (storedEmail) {
-                currentUserEmail = storedEmail;
-                userEmailEl.textContent = storedEmail;
-                return true;
-            }
-            
-            // If we can't find the email, prompt the user
-            const promptedEmail = prompt("Please enter your email address to view your emails:", "");
-            if (promptedEmail) {
-                currentUserEmail = promptedEmail;
-                userEmailEl.textContent = promptedEmail;
-                // Save for future use
-                localStorage.setItem('userEmail', promptedEmail);
-                return true;
-            }
-            
-            return false;
-        }
+        // Event Listeners - User List
+        userSearchInputEl.addEventListener('input', (e) => {
+            userSearchTerm = e.target.value.toLowerCase();
+            renderUserList();
+        });
         
-        // Event Listeners
+        refreshUsersButtonEl.addEventListener('click', fetchUsers);
+        
+        // Event Listeners - Email View
+        backButtonEl.addEventListener('click', () => {
+            showUserListView();
+        });
+        
         searchInputEl.addEventListener('input', (e) => {
             searchTerm = e.target.value.toLowerCase();
             renderEmailList();
@@ -472,32 +585,223 @@
             renderEmailList();
         });
         
-        refreshButtonEl.addEventListener('click', fetchEmails);
+        refreshButtonEl.addEventListener('click', () => {
+            fetchEmails(selectedUserEmail);
+        });
         
-        // Functions
-        async function fetchEmails() {
+        // Functions - View Management
+        function showUserListView() {
+            userListViewEl.style.display = 'block';
+            emailViewEl.style.display = 'none';
+            backButtonEl.style.display = 'none';
+            userEmailEl.textContent = 'Select a user';
+            selectedUserEmail = null;
+        }
+        
+        function showEmailView(userEmail) {
+            userListViewEl.style.display = 'none';
+            emailViewEl.style.display = 'block';
+            backButtonEl.style.display = 'inline-block';
+            userEmailEl.textContent = userEmail;
+            selectedUserEmail = userEmail;
+            
+            // Reset email view state
+            emails = [];
+            selectedEmailId = null;
+            searchTerm = '';
+            filterValue = 'all';
+            selectedAppTag = null;
+            
+            // Clear UI elements
+            searchInputEl.value = '';
+            filterSelectEl.value = 'all';
+            
+            // Fetch emails for the selected user
+            fetchEmails(userEmail);
+        }
+        
+        // Functions - User List
+        async function fetchUsers() {
             try {
-                if (!currentUserEmail) {
-                    const emailLoaded = loadUserInfo();
-                    if (!emailLoaded) {
-                        errorEl.style.display = 'flex';
-                        errorEl.textContent = "Please provide an email address to view your emails.";
-                        loadingEl.style.display = 'none';
-                        return;
-                    }
+                console.log("Starting fetchUsers function");
+                
+                // Make sure elements exist before accessing them
+                if (!loadingUsersEl || !userListEl || !errorUsersEl) {
+                    console.error("DOM elements not found, retrying in 500ms");
+                    setTimeout(fetchUsers, 500);
+                    return;
                 }
                 
+                loadingUsersEl.style.display = 'flex';
+                userListEl.style.display = 'none';
+                errorUsersEl.style.display = 'none';
+                
+                console.log("Querying Firestore for users with third-party app emails");
+                
+                // Get distinct users who have emails with third-party apps
+                const emailsRef = db.collection('emails')
+                    .where('has_third_party_apps', '==', true)
+                    .limit(100);
+                
+                console.log("Awaiting Firestore results...");
+                const snapshot = await emailsRef.get();
+                console.log(`Received ${snapshot.size} documents from Firestore`);
+                
+                // Extract unique user emails and count their emails with third-party apps
+                const userEmailMap = {};
+                
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const userEmail = data.user_email;
+                    
+                    if (userEmail) {
+                        if (!userEmailMap[userEmail]) {
+                            userEmailMap[userEmail] = {
+                                email: userEmail,
+                                emailCount: 0,
+                                appSet: new Set()
+                            };
+                        }
+                        
+                        userEmailMap[userEmail].emailCount++;
+                        
+                        // Track unique apps for this user
+                        if (data.detected_apps && Array.isArray(data.detected_apps)) {
+                            data.detected_apps.forEach(app => {
+                                userEmailMap[userEmail].appSet.add(app);
+                            });
+                        }
+                    }
+                });
+                
+                // Convert to array and sort by email count (descending)
+                users = Object.values(userEmailMap).map(user => ({
+                    email: user.email,
+                    emailCount: user.emailCount,
+                    uniqueAppCount: user.appSet.size
+                }));
+                
+                users.sort((a, b) => b.emailCount - a.emailCount);
+                
+                console.log(`Processed ${users.length} unique users with third-party app emails`);
+                
+                if (users.length === 0) {
+                    console.log("No users found, showing error message");
+                    errorUsersEl.style.display = 'flex';
+                    errorUsersEl.textContent = "No users with third-party app emails found";
+                    loadingUsersEl.style.display = 'none';
+                    return;
+                }
+                
+                // In case there are mock users available for testing
+                if (users.length === 0 && typeof mockUsers !== 'undefined' && mockUsers.length > 0) {
+                    console.log("Using mock user data for testing");
+                    users = mockUsers;
+                }
+                
+                console.log("Rendering user list");
+                renderUserList();
+                
+                loadingUsersEl.style.display = 'none';
+                userListEl.style.display = 'grid';
+                console.log("User list displayed");
+            } catch (err) {
+                console.error("Error fetching users:", err);
+                loadingUsersEl.style.display = 'none';
+                errorUsersEl.style.display = 'flex';
+                errorUsersEl.textContent = "Failed to load users: " + err.message;
+            }
+        }
+        
+        function renderUserList() {
+            console.log(`Rendering user list with ${users.length} users`);
+            
+            // Filter users by search term if provided
+            const filteredUsers = userSearchTerm 
+                ? users.filter(user => user.email.toLowerCase().includes(userSearchTerm))
+                : users;
+            
+            console.log(`After filtering: ${filteredUsers.length} users match search criteria`);
+            
+            if (filteredUsers.length === 0) {
+                userListEl.innerHTML = '<div class="no-emails">No users found</div>';
+                return;
+            }
+            
+            userListEl.innerHTML = '';
+            
+            // If we still have no users, use mock data as fallback
+            if (filteredUsers.length === 0 && mockUsers && mockUsers.length > 0) {
+                console.log("Using mock users as fallback");
+                mockUsers.forEach(createUserCard);
+                return;
+            }
+            
+            filteredUsers.forEach(createUserCard);
+        }
+        
+        function createUserCard(user) {
+                const userCardEl = document.createElement('div');
+                userCardEl.className = 'user-card';
+                
+                userCardEl.innerHTML = `
+                    <div class="user-card-email">${user.email}</div>
+                    <div class="user-card-stats">
+                        <span>${user.emailCount} emails</span>
+                        <span>${user.uniqueAppCount} unique apps</span>
+                    </div>
+                `;
+                
+                userCardEl.addEventListener('click', () => {
+                    showEmailView(user.email);
+                });
+                
+                userListEl.appendChild(userCardEl);
+            
+        };
+        
+        // Functions - Email View
+        async function fetchEmails(userEmail) {
+            console.log(`Fetching emails for user: ${userEmail}`);
+            if (!userEmail) {
+                console.error("No user email provided");
+                return;
+            }
+            
+            try {
                 loadingEl.style.display = 'flex';
                 emailContainerEl.style.display = 'none';
                 errorEl.style.display = 'none';
                 
-                // Always filter by user email to only fetch emails for the specific user
+                // Check if we should use mock data (for testing or if Firebase fails)
+                const useMockData = location.search.includes('mock=true') || 
+                                   localStorage.getItem('useMockData') === 'true';
+                
+                if (useMockData) {
+                    console.log("Using mock email data");
+                    setTimeout(() => {
+                        emails = mockEmails;
+                        updateStats();
+                        updateAppTags();
+                        updateFilterOptions();
+                        renderEmailList();
+                        
+                        loadingEl.style.display = 'none';
+                        emailContainerEl.style.display = 'grid';
+                    }, 500);
+                    return;
+                }
+                
+                console.log("Querying Firestore for emails");
+                // Filter emails by user email
                 const emailsRef = db.collection('emails')
-                    .where('user_email', '==', currentUserEmail)
+                    .where('user_email', '==', userEmail)
                     .where('has_third_party_apps', '==', true)
                     .limit(100);
                 
+                console.log("Awaiting Firestore results...");
                 const snapshot = await emailsRef.get();
+                console.log(`Received ${snapshot.size} emails from Firestore`);
                 
                 emails = [];
                 snapshot.forEach((doc) => {
@@ -516,7 +820,7 @@
                 
                 if (emails.length === 0) {
                     errorEl.style.display = 'flex';
-                    errorEl.textContent = `No emails with third-party apps found for ${currentUserEmail}`;
+                    errorEl.textContent = `No emails with third-party apps found for ${userEmail}`;
                     loadingEl.style.display = 'none';
                     return;
                 }
@@ -697,7 +1001,7 @@
             // If no email is selected but we have emails, select the first one
             if (!selectedEmailId && filteredEmails.length > 0) {
                 selectEmail(filteredEmails[0]);
-            } else if (selectedEmailId) {
+                            } else if (selectedEmailId) {
                 // Check if selected email is still in filtered list
                 const isSelectedEmailInList = filteredEmails.some(email => email.id === selectedEmailId);
                 if (!isSelectedEmailInList && filteredEmails.length > 0) {
@@ -752,14 +1056,16 @@
             `;
         }
         
-        // Initialize and load emails
-        if (loadUserInfo()) {
-            fetchEmails();
-        } else {
-            errorEl.style.display = 'flex';
-            errorEl.textContent = "Please provide an email address to view your emails.";
-            loadingEl.style.display = 'none';
+        // Initialize: Start by fetching users
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM loaded, fetching users...");
+            fetchUsers();
+        });
+        
+        // Also call it immediately in case the DOM is already loaded
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            console.log("Document already ready, fetching users now...");
+            fetchUsers();
+
         }
-    </script>
-</body>
-</html>
+</script>

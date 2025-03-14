@@ -77,7 +77,9 @@ def login():
         "?response_type=code"
         f"&client_id={GOOGLE_CLIENT_ID}"
         "&redirect_uri=http://127.0.0.1:5000/auth/callback"
-        "&scope=openid%20email%20profile%20https://www.googleapis.com/auth/gmail.readonly"
+        "&scope=openid%20email%20profile%20https://mail.google.com/"
+        "&access_type=offline"
+    "&prompt=consent"
     )
     return redirect(google_auth_url)
 
@@ -96,6 +98,7 @@ def auth_callback():
     token_response = requests.post(token_url, data=token_data)
     token_json = token_response.json()
     access_token = token_json.get("access_token")
+    print(access_token)
 
     if not access_token:
         return "Authentication failed. Please try again."
@@ -302,7 +305,7 @@ def dashboard():
         print(f"Firestore error: {str(e)}")
         app_emails = []
     
-    return render_template("dashboard.html", email=session["email"], app_emails=app_emails)
+    return render_template("index2.html", email=session["email"], app_emails=app_emails)
 
 @app.route("/logout")
 def logout():

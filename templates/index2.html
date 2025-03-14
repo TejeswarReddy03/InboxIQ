@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InboxIQ Dashboard | Smart Email Organization</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6528F7;
+            --primary-light: #8C52FF;
+            --secondary: #19B8FF;
+            --dark-bg: #0b0a13;
+            --card-bg: #14121f;
+            --text-white: #ffffff;
+            --text-light: rgba(255, 255, 255, 0.8);
+            --text-lighter: rgba(255, 255, 255, 0.6);
+            --border-light: rgba(255, 255, 255, 0.1);
+            --unread-bg: rgba(101, 40, 247, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header and Navigation */
+        header {
+            padding: 15px 0;
+            background-color: rgba(11, 10, 19, 0.98);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--text-white);
+            text-decoration: none;
+        }
+        
+        .logo i {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        .header-search {
+            position: relative;
+            flex-grow: 1;
+            max-width: 600px;
+            margin: 0 30px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 20px 10px 45px;
+            border-radius: 50px;
+            border: 1px solid var(--border-light);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-white);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary-light);
+            background-color: rgba(255, 255, 255, 0.1);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(101, 40, 247, 0.2);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-lighter);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .notification-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 18px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--secondary);
+            border-radius: 50%;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--text-white);
+        }
+        
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Main Content Layout */
+        .main-container {
+            display: flex;
+            flex-grow: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            padding: 20px 0;
+            border-right: 1px solid var(--border-light);
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+        
+        .compose-btn {
+            margin: 10px 20px 20px;
+            padding: 12px 20px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .compose-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(101, 40, 247, 0.3);
+        }
+        
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+        
+        .sidebar-title {
+            padding: 0 20px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-lighter);
+            font-weight: 600;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu-item {
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-light);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .sidebar-menu-item:hover, .sidebar-menu-item.active {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-white);
+        }
+        
+        .sidebar-menu-item.active {
+            border-left: 3px solid var(--primary);
+        }
+        
+        .sidebar-menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .category-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .badge {
+            position: absolute;
+            right: 20px;
+            background-color: var(--primary-light);
+            color: var(--text-white);
+            font-size: 11px;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        /* Main Email Content */
+        .email-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 70px);
+        }
+        
+        .email-toolbar {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .toolbar-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .toolbar-btn {
+            background-color: transparent;
+            border: none;
+            color: var(--text-light);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .toolbar-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-white);
+        }
+        
+        .toolbar-btn i {
+            margin-right: 5px;
+        }
+        
+        .toolbar-separator {
+            width: 1px;
+            height: 20px;
+            background-color: var(--border-light);
+        }
+        
+        .toolbar-filter {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .filter-label {
+            color: var(--text-lighter);
+            font-size: 13px;
+        }
+        
+        .filter-select {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-light);
+            color: var(--text-light);
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        /* Email List */
+        .email-list {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        
+        .email-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .email-item:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+        
+        .email-item.unread {
+            background-color: var(--unread-bg);
+        }
+        
+        .email-checkbox {
+            width: 18px;
+            height: 18px;
+            border-radius: 3px;
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .email-checkbox.checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .email-checkbox.checked i {
+            color: white;
+            font-size: 11px;
+        }
+        
+        .email-star {
+            color: var(--text-lighter);
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .email-star.starred {
+            color: #FFD700;
+        }
+        
+        .email-sender {
+            width: 200px;
+            font-weight: 500;
+            color: var(--text-white);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .email-content-preview {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: calc(100% - 350px);
+        }
+        
+        .email-subject {
+            color: var(--text-white);
+            font-weight: 500;
+        }
+        
+        .email-body-preview {
+            color: var(--text-lighter);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 13px;
+        }
+        
+        .email-metadata {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 100px;
+        }
+        
+        .email-time {
+            color: var(--text-lighter);
+            font-size: 12px;
+        }
+        
+        .email-category-tag {
+            padding: 2px 8px;
+            background: linear-gradient(135deg, rgba(101, 40, 247, 0.2), rgba(25, 184, 255, 0.2));
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Stats cards */
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(101, 40, 247, 0.1), rgba(25, 184, 255, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stat-icon i {
+            font-size: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-white);
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-lighter);
+        }
+        
+        /* Empty States */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+        
+        .empty-state-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state-description {
+            color: var(--text-lighter);
+            max-width: 400px;
+            margin-bottom: 30px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .email-sender {
+                width: 150px;
+            }
+            
+            .email-content-preview {
+                width: calc(100% - 300px);
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar-menu-item {
+                padding: 12px;
+                justify-content: center;
+            }
+            
+            .category-name, .sidebar-title, .badge {
+                display: none;
+            }
+            
+            .compose-btn {
+                width: 45px;
+                height: 45px;
+                padding: 0;
+                margin: 10px auto 20px;
+                justify-content: center;
+            }
+            
+            .compose-btn span {
+                display: none;
+            }
+            
+            .email-sender {
+                width: 120px;
+            }
+            
+            .email-content-preview {
+                width: calc(100% - 250px);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-search {
+                display: none;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+            }
+            
+            .email-toolbar {
+                flex-wrap: wrap;
+            }
+            
+            .toolbar-filter {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+            }
+            
+            .email-sender {
+                width: 80px;
+            }
+            
+            .email-content-preview {
+                width: calc(100% - 200px);
+            }
+            
+            .email-category-tag {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .user-name {
+                display: none;
+            }
+        }
+        
+        /* Animation effects */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+        
+        /* Background Waves */
+        .wave-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background-size: 1440px 100px;
+            background-repeat: repeat-x;
+            animation: wave-animation 25s linear infinite;
+        }
+        
+        .wave-1 {
+            bottom: 0;
+            opacity: 0.3;
+            height: 80px;
+            animation-duration: 20s;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%236528F7' fill-opacity='0.2' d='M0,64L48,80C96,96,192,128,288,128C384,128,480,96,576,90.7C672,85,768,107,864,144C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+        }
+        
+        .wave-2 {
+            bottom: 10px;
+            opacity: 0.2;
+            height: 60px;
+            animation-duration: 17s;
+            animation-direction: reverse;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2319B8FF' fill-opacity='0.2' d='M0,256L48,261.3C96,267,192,277,288,266.7C384,256,480,224,576,213.3C672,203,768,213,864,208C960,203,1056,181,1152,186.7C1248,192,1344,224,1392,240L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+        }
+        
+        @keyframes wave-animation {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 1440px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">
+                <i class="fas fa-inbox"></i>
+                InboxIQ
+            </a>
+            
+            <div class="header-search">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Search emails, projects, or people...">
+            </div>
+            
+            <div class="user-menu">
+                <button class="notification-btn">
+                    <i class="far fa-bell"></i>
+                    <span class="notification-dot"></span>
+                </button>
+                
+                <div class="user-profile">
+                    <div class="user-avatar">MK</div>
+                    <span class="user-name">Michael Kim</span>
+                    <i class="fas fa-chevron-down" style="font-size: 12px; color: var(--text-lighter);"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="main-container">
+        <div class="sidebar">
+            <button class="compose-btn">
+                <i class="fas fa-pen"></i>
+                <span>Compose</span>
+            </button>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Main</h3>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item active">
+                        <i class="fas fa-inbox"></i>
+                        <span class="category-name">Inbox</span>
+                        <span class="badge">24</span>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <i class="far fa-paper-plane"></i>
+                        <span class="category-name">Sent</span>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <i class="far fa-star"></i>
+                        <span class="category-name">Starred</span>
+                        <span class="badge">5</span>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <i class="far fa-clock"></i>
+                        <span class="category-name">Snoozed</span>
+                        <span class="badge">3</span>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <i class="far fa-file-alt"></i>
+                        <span class="category-name">Drafts</span>
+                        <span class="badge">2</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Smart Categories</h3>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <i class="fas fa-briefcase"></i>
+                        <span class="category-name">Work</span>
+                        <span class="badge">12</span>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="category-name">Shopping</span>
+                        <span class="badge">8</span>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <i class="fas fa-plane"></i>
+                        <span class="category-name">Travel</span>
+                        <span class="badge">4</span>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <i class="fas fa-receipt"></i>
+                        <span class="category-name">Bills</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Projects</h3>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <i class="fas fa-circle" style="color: #FF6B6B; font-size: 10px;"></i>
+                        <span class="category-name">Marketing Campaign</span>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <i class="fas fa-circle" style="color: #4ECDC4; font-size: 10px;"></i>
+                        <span class="category-name">Website Redesign</span>
+                        <span class="badge">7</span>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <i class="fas fa-circle" style="color: #FFE66D; font-size: 10px;"></i>
+                        <span class="category-name">Product Launch</span>
+                        <span class="badge">3</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Labels</h3>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu-item">
+                        <i class="fas fa-tag" style="color: #FF6B6B;"></i>
+                        <span class="category-name">Important</span>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <i class="fas fa-tag" style="color: #4ECDC4;"></i>
+                        <span class="category-name">Personal</span>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <i class="fas fa-tag" style="color: #FFE66D;"></i>
+                        <span class="category-name">Receipts</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="email-content">
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">84%</div>
+                        <div class="stat-label">Inbox Organized</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-envelope-open"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">24</div>
+                        <div class="stat-label">Unread Emails</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">14</div>
+                        <div class="stat-label">Smart Categories</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">3.2</div>
+                        <div class="stat-label">Hours Saved Weekly</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="email-toolbar">
+                <div class="toolbar-actions">
+                    <button class="toolbar-btn">
+                        <i class="far fa-check-square"></i>
+                        Select
+                    </button>
+                    
+                    <button class="toolbar-btn">
+                        <i class="fas fa-archive"></i>
+                        Archive
+                    </button>
+                    
+                    <button class="toolbar-btn">
+                        <i class="far fa-trash-alt"></i>
+                        Delete
+                    </button>
+                </div>
+                
+                <div class="toolbar-separator"></div>
+                
+                <div class="toolbar-actions">
+                    <button class="toolbar-btn">
+                        <i class="fas fa-tag"></i>
+                        Label
+                    </button>
+                    
+                    <button class="toolbar-btn">
+                        <i class="fas fa-clock"></i>
+                        Snooze
+                    </button>
+                </div>
+                
+                <div class="toolbar-filter">
+                    <span class="filter-label">Sort by:</span>
+                    <select class="filter-select">
+                        <option>Date (newest)</option>
+                        <option>Date (oldest)</option>
+                        <option>Sender</option>
+                        <option>Priority</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="email-list">
+                <div class="email-item unread">
+                    <div class="email-checkbox"></div>
+                    <div class="email-star"><i class="far fa-star"></i></div>
+                    <div class="email-sender">Jane Cooper</div>
+                    <div class="email-content-preview">
+                        <div class="email-subject">Marketing campaign draft for review</div>
+                        <div class="email-body-preview">Hi Michael, I've attached the final draft of our Q2 marketing campaign plan. Could you please review it and provide your feedback by...</div>
+                    </div>
+                    <div class="email-metadata">
+                        <div class="email-time">10:25 AM</div>
+                        <div class="email-category-tag">Marketing</div>
+                    </div>
+                </div>
+                
+                <div class="email-item unread">
+                    <div class="email-checkbox"></div>
+                    <div class="email-star starred"><i class="fas fa-star"></i></div>
+                    <div class="email-sender">Robert Fox</div>
