@@ -20,8 +20,8 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
-# app.config["SESSION_TYPE"] = os.getenv("SESSION_TYPE")
-# Session(app)
+app.config["SESSION_TYPE"] = os.getenv("SESSION_TYPE")
+Session(app)
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
