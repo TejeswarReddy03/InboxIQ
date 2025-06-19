@@ -364,11 +364,217 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        margin: 5px;
       }
 
       .upload-button:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(101, 40, 247, 0.3);
+      }
+
+      /* Text Editor Styles */
+      .text-editor-zone {
+        border: 2px solid var(--border-light);
+        border-radius: 12px;
+        background-color: var(--card-bg);
+        margin: 20px 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        width: 100%;
+        max-width: 800px;
+      }
+
+      .editor-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        padding: 15px 20px;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid var(--border-light);
+      }
+
+      .editor-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-white);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .editor-toolbar {
+        display: flex;
+        gap: 10px;
+        margin-left: auto;
+      }
+
+      .toolbar-button {
+        background: none;
+        border: 1px solid var(--border-light);
+        color: var(--text-light);
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+      }
+
+      .toolbar-button:hover {
+        border-color: var(--primary-light);
+        color: var(--primary-light);
+      }
+
+      .text-editor {
+        width: 100%;
+        min-height: 300px;
+        background-color: transparent;
+        border: none;
+        color: var(--text-white);
+        font-size: 1rem;
+        line-height: 1.6;
+        padding: 20px;
+        resize: vertical;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        outline: none;
+      }
+
+      .text-editor::placeholder {
+        color: var(--text-lighter);
+      }
+
+      .editor-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background-color: rgba(255, 255, 255, 0.02);
+        border-top: 1px solid var(--border-light);
+      }
+
+      .word-count {
+        font-size: 0.9rem;
+        color: var(--text-lighter);
+      }
+
+      .editor-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .export-dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .export-button {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .export-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(101, 40, 247, 0.3);
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        bottom: 100%;
+        right: 0;
+        background-color: var(--card-bg);
+        min-width: 200px;
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        margin-bottom: 10px;
+      }
+
+      .dropdown-content.show {
+        display: block;
+        animation: fadeInUp 0.3s ease;
+      }
+
+      .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        color: var(--text-light);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: var(--primary-light);
+      }
+
+      .dropdown-item i {
+        width: 16px;
+        text-align: center;
+      }
+
+      /* Export Success Animation */
+      .export-success {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: var(--card-bg);
+        border: 1px solid var(--success);
+        border-radius: 12px;
+        padding: 30px 40px;
+        text-align: center;
+        z-index: 2000;
+        display: none;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      }
+
+      .export-success.show {
+        display: block;
+        animation: fadeInUp 0.5s ease;
+      }
+
+      .success-icon {
+        font-size: 3rem;
+        color: var(--success);
+        margin-bottom: 15px;
+      }
+
+      .success-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: var(--text-white);
+      }
+
+      .success-message {
+        color: var(--text-light);
+        margin-bottom: 20px;
+      }
+
+      .success-link {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-family: monospace;
+        font-size: 0.9rem;
+        color: var(--primary-light);
+        margin-bottom: 20px;
+        word-break: break-all;
       }
 
       /* Help Section */
@@ -542,6 +748,20 @@
         .upload-zone {
           padding: 40px 20px;
         }
+
+        .editor-toolbar {
+          flex-wrap: wrap;
+        }
+
+        .editor-footer {
+          flex-direction: column;
+          gap: 15px;
+          align-items: stretch;
+        }
+
+        .editor-actions {
+          justify-content: center;
+        }
       }
 
       @media (max-width: 576px) {
@@ -605,68 +825,30 @@
           </div>
         </div>
 
-        <div class="getting-started fade-in-up">
-          <div class="steps-header">
-            <h2 class="steps-title">Get Started in 3 Easy Steps</h2>
-            <p class="steps-subtitle">Complete these steps to unlock the full power of InboxIQ</p>
+        <div class="text-editor-zone" id="textEditorZone">
+          <div class="editor-header">
+            <div class="editor-title">
+              <i class="fas fa-edit"></i>
+              Write & Share Your Content
+            </div>
           </div>
-
-          <div class="steps-container">
-            <div class="step-card" id="step1" onclick="completeStep(1)">
-              <div class="step-number">1</div>
-              <div class="step-icon">
-                <i class="fas fa-cloud-upload-alt"></i>
-              </div>
-              <h3 class="step-title">Upload Your First File</h3>
-              <p class="step-description">
-                Drag & drop any file or click to browse. We support all file types up to 5GB.
-              </p>
-              <button class="step-action pulse-glow" onclick="showUploadZone(event)">
-                Upload Now
-              </button>
-            </div>
-
-            <div class="step-card" id="step2">
-              <div class="step-number">2</div>
-              <div class="step-icon">
-                <i class="fas fa-share-alt"></i>
-              </div>
-              <h3 class="step-title">Share Your First Link</h3>
-              <p class="step-description">
-                Generate a secure sharing link with custom permissions and expiration dates.
-              </p>
-              <button class="step-action" disabled>
-                Complete Step 1 First
-              </button>
-            </div>
-
-            <div class="step-card" id="step3">
-              <div class="step-number">3</div>
-              <div class="step-icon">
-                <i class="fas fa-users"></i>
-              </div>
-              <h3 class="step-title">Invite Your Team</h3>
-              <p class="step-description">
-                Add team members and start collaborating with advanced permission controls.
-              </p>
-              <button class="step-action" disabled>
-                Coming Soon
+          
+          <textarea 
+            class="text-editor" 
+            id="textEditor" 
+            placeholder="Start typing your content here... You can write notes, documents, code, or anything you want to share!"
+            oninput="updateWordCount()"
+          ></textarea>
+          
+          <div class="editor-footer">
+            <div class="word-count" id="wordCount">0 words, 0 characters</div>
+            <div class="editor-actions">
+              <button class="export-button" onclick="shareTodrive()" id="shareButton" disabled>
+                <i class="fab fa-google-drive"></i>
+                Share to Drive
               </button>
             </div>
           </div>
-        </div>
-
-        <div class="upload-zone hidden" id="uploadZone">
-          <div class="upload-icon">
-            <i class="fas fa-cloud-upload-alt"></i>
-          </div>
-          <div class="upload-text">Drop your files here</div>
-          <div class="upload-subtext">or click to browse from your computer</div>
-          <button class="upload-button" onclick="document.getElementById('fileInput').click()">
-            <i class="fas fa-plus"></i>
-            Choose Files
-          </button>
-          <input type="file" id="fileInput" multiple style="display: none;">
         </div>
 
         <div class="help-section fade-in-up">
@@ -705,6 +887,19 @@
       </div>
     </div>
 
+    <div class="export-success" id="exportSuccess">
+      <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="success-title">Content Shared Successfully!</div>
+      <div class="success-message">Your content has been saved and a sharing link has been generated.</div>
+      <div class="success-link">https://inboxiq.app/s/abc123def456</div>
+      <button class="upload-button" onclick="hideExportSuccess()">
+        <i class="fas fa-check"></i>
+        Continue
+      </button>
+    </div>
+
     <script>
       let currentStep = 1;
       let completedSteps = 0;
@@ -718,40 +913,61 @@
         progressText.textContent = `${completedSteps} of 3 steps`;
       }
 
-      function showUploadZone(event) {
-        event.stopPropagation();
-        const uploadZone = document.getElementById('uploadZone');
-        uploadZone.classList.remove('hidden');
-        uploadZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-
-      function completeStep(stepNumber) {
-        const stepCard = document.getElementById(`step${stepNumber}`);
+      function updateWordCount() {
+        const textEditor = document.getElementById('textEditor');
+        const wordCount = document.getElementById('wordCount');
+        const shareButton = document.getElementById('shareButton');
+        const text = textEditor.value;
         
-        if (!stepCard.classList.contains('completed')) {
-          stepCard.classList.add('completed');
-          completedSteps++;
-          updateProgress();
-          showToast();
-          
-          // Enable next step
-          if (stepNumber < 3) {
-            const nextStep = document.getElementById(`step${stepNumber + 1}`);
-            const nextButton = nextStep.querySelector('.step-action');
-            nextButton.disabled = false;
-            nextButton.textContent = stepNumber === 1 ? 'Create Share Link' : 'Invite Team';
-            nextButton.classList.add('pulse-glow');
-          }
-          
-          // Update step content
-          const stepAction = stepCard.querySelector('.step-action');
-          stepAction.innerHTML = '<i class="fas fa-check"></i> Completed';
-          stepAction.disabled = true;
+        const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+        const characters = text.length;
+        
+        wordCount.textContent = `${words} words, ${characters} characters`;
+        
+        // Enable/disable share button based on content
+        if (text.trim().length > 0) {
+          shareButton.disabled = false;
+          shareButton.style.opacity = '1';
+        } else {
+          shareButton.disabled = true;
+          shareButton.style.opacity = '0.5';
         }
       }
 
-      function showToast() {
+      function shareTodrive() {
+        const textEditor = document.getElementById('textEditor');
+        const shareButton = document.getElementById('shareButton');
+        const content = textEditor.value.trim();
+        
+        if (!content) {
+          return;
+        }
+        
+        // Show loading state
+        shareButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sharing...';
+        shareButton.disabled = true;
+        
+        // Simulate sharing process
+        setTimeout(() => {
+          shareButton.innerHTML = '<i class="fas fa-check"></i> Shared to Drive';
+          shareButton.style.background = 'var(--success)';
+          
+          // Show success toast
+          showToast('Content successfully shared to Google Drive!');
+          
+          // Reset button after 3 seconds
+          setTimeout(() => {
+            shareButton.innerHTML = '<i class="fab fa-google-drive"></i> Share to Drive';
+            shareButton.style.background = 'linear-gradient(135deg, var(--primary), var(--secondary))';
+            shareButton.disabled = false;
+          }, 3000);
+        }, 1500);
+      }
+
+      function showToast(message = 'Great! Step completed successfully.') {
         const toast = document.getElementById('progressToast');
+        const toastText = toast.querySelector('.toast-text');
+        toastText.textContent = message;
         toast.style.display = 'block';
         
         setTimeout(() => {
@@ -784,7 +1000,11 @@
       });
 
       uploadZone.addEventListener('drop', handleDrop, false);
-      uploadZone.addEventListener('click', () => fileInput.click());
+      uploadZone.addEventListener('click', (e) => {
+        if (e.target.closest('.upload-button[onclick*="fileInput"]')) {
+          fileInput.click();
+        }
+      });
 
       function preventDefaults(e) {
         e.preventDefault();
@@ -868,6 +1088,10 @@
             setTimeout(updateCount, index * 200);
           }
         });
+        
+        // Initialize word count and focus on text editor 
+        updateWordCount();
+        document.getElementById('textEditor').focus();
       });
     </script>
   </body>
