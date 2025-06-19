@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>InboxIQ Dashboard | Smart Email Organization</title>
+    <title>Welcome to FileFlow | Get Started</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -19,7 +19,9 @@
         --text-light: rgba(255, 255, 255, 0.8);
         --text-lighter: rgba(255, 255, 255, 0.6);
         --border-light: rgba(255, 255, 255, 0.1);
-        --unread-bg: rgba(101, 40, 247, 0.15);
+        --success: #4CAF50;
+        --warning: #FF9800;
+        --danger: #F44336;
       }
 
       * {
@@ -40,7 +42,7 @@
         flex-direction: column;
       }
 
-      /* Header and Navigation */
+      /* Header */
       header {
         padding: 15px 0;
         background-color: rgba(11, 10, 19, 0.98);
@@ -75,89 +77,47 @@
         font-size: 24px;
       }
 
-      .header-search {
-        position: relative;
-        flex-grow: 1;
-        max-width: 600px;
-        margin: 0 30px;
-      }
-
-      .search-input {
-        width: 100%;
-        padding: 10px 20px 10px 45px;
-        border-radius: 50px;
-        border: 1px solid var(--border-light);
-        background-color: rgba(255, 255, 255, 0.05);
-        color: var(--text-white);
-        font-size: 14px;
-        transition: all 0.3s ease;
-      }
-
-      .search-input:focus {
-        border-color: var(--primary-light);
-        background-color: rgba(255, 255, 255, 0.1);
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(101, 40, 247, 0.2);
-      }
-
-      .search-icon {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--text-lighter);
-      }
-
-      .user-menu {
+      .welcome-message {
         display: flex;
         align-items: center;
-        gap: 20px;
+        gap: 15px;
       }
 
-      .notification-btn {
-        background: none;
-        border: none;
+      .welcome-text {
+        font-size: 14px;
         color: var(--text-light);
-        font-size: 18px;
-        cursor: pointer;
-        position: relative;
       }
 
-      .notification-dot {
-        position: absolute;
-        top: -2px;
-        right: -2px;
-        width: 8px;
-        height: 8px;
-        background-color: var(--secondary);
-        border-radius: 50%;
-      }
-
-      .user-profile {
+      .progress-indicator {
         display: flex;
         align-items: center;
         gap: 10px;
-        cursor: pointer;
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 8px 15px;
+        border-radius: 20px;
       }
 
-      .user-avatar {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background-color: var(--primary-light);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        color: var(--text-white);
+      .progress-bar {
+        width: 60px;
+        height: 4px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
       }
 
-      .user-name {
-        font-size: 14px;
-        font-weight: 500;
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        width: 20%;
+        transition: width 0.5s ease;
       }
 
-      /* Main Content Layout */
+      .progress-text {
+        font-size: 12px;
+        color: var(--text-lighter);
+      }
+
+      /* Main Container */
       .main-container {
         display: flex;
         flex-grow: 1;
@@ -166,462 +126,324 @@
         width: 100%;
       }
 
-      /* Sidebar */
-      .sidebar {
-        width: 240px;
-        padding: 20px 0;
-        border-right: 1px solid var(--border-light);
-        height: calc(100vh - 70px);
-        overflow-y: auto;
+      /* Welcome Section */
+      .welcome-section {
+        flex-grow: 1;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
       }
 
-      .compose-btn {
-        margin: 10px 20px 20px;
-        padding: 12px 20px;
-        border-radius: 50px;
+      .welcome-hero {
+        max-width: 600px;
+        margin-bottom: 40px;
+      }
+
+      .welcome-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 16px;
         background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: white;
-        border: none;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .welcome-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-light);
+        margin-bottom: 30px;
+      }
+
+      .quick-stats {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .stat-item {
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-white);
+        display: block;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        color: var(--text-lighter);
+      }
+
+      /* Getting Started Steps */
+      .getting-started {
+        width: 100%;
+        max-width: 800px;
+        margin-bottom: 40px;
+      }
+
+      .steps-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .steps-title {
+        font-size: 1.5rem;
         font-weight: 600;
-        font-size: 14px;
+        margin-bottom: 10px;
+      }
+
+      .steps-subtitle {
+        color: var(--text-lighter);
+      }
+
+      .steps-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .step-card {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        padding: 25px;
+        position: relative;
+        border: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .step-card:hover {
+        border-color: var(--primary-light);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(101, 40, 247, 0.2);
+      }
+
+      .step-card.completed {
+        border-color: var(--success);
+        background-color: rgba(76, 175, 80, 0.05);
+      }
+
+      .step-number {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        color: white;
+      }
+
+      .step-card.completed .step-number {
+        background-color: var(--success);
+      }
+
+      .step-icon {
+        font-size: 2rem;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .step-card.completed .step-icon {
+        color: var(--success);
+      }
+
+      .step-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .step-description {
+        color: var(--text-lighter);
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+      }
+
+      .step-action {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
       }
 
-      .compose-btn:hover {
+      .step-action:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(101, 40, 247, 0.3);
+        box-shadow: 0 5px 15px rgba(101, 40, 247, 0.3);
       }
 
-      .sidebar-section {
-        margin-bottom: 30px;
+      .step-card.completed .step-action {
+        background-color: var(--success);
       }
 
-      .sidebar-title {
-        padding: 0 20px;
-        margin-bottom: 10px;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+      /* Upload Zone */
+      .upload-zone {
+        border: 2px dashed var(--border-light);
+        border-radius: 12px;
+        padding: 60px 40px;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.02);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin: 20px 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .upload-zone:hover {
+        border-color: var(--primary-light);
+        background-color: rgba(101, 40, 247, 0.05);
+      }
+
+      .upload-zone.dragover {
+        border-color: var(--primary);
+        background-color: rgba(101, 40, 247, 0.1);
+        transform: scale(1.02);
+      }
+
+      .upload-zone.hidden {
+        display: none;
+      }
+
+      .upload-icon {
+        font-size: 4rem;
         color: var(--text-lighter);
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .upload-text {
+        font-size: 1.2rem;
+        color: var(--text-light);
+        margin-bottom: 10px;
         font-weight: 600;
       }
 
-      .sidebar-menu {
-        list-style: none;
+      .upload-subtext {
+        font-size: 0.9rem;
+        color: var(--text-lighter);
+        margin-bottom: 20px;
       }
 
-      .sidebar-menu-item {
-        padding: 8px 20px;
+      .upload-button {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .upload-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(101, 40, 247, 0.3);
+      }
+
+      /* Help Section */
+      .help-section {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        padding: 25px;
+        margin-top: 30px;
+        border: 1px solid var(--border-light);
+      }
+
+      .help-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .help-links {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .help-link {
+        color: var(--text-light);
+        text-decoration: none;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.3s ease;
+      }
+
+      .help-link:hover {
+        color: var(--primary-light);
+      }
+
+      /* Progress Toast */
+      .progress-toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        padding: 15px 20px;
+        display: none;
+        z-index: 1000;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .toast-content {
         display: flex;
         align-items: center;
         gap: 12px;
+      }
+
+      .toast-icon {
+        color: var(--success);
+        font-size: 1.2rem;
+      }
+
+      .toast-text {
+        font-size: 0.9rem;
         color: var(--text-light);
-        transition: all 0.2s ease;
-        cursor: pointer;
-        position: relative;
       }
 
-      .sidebar-menu-item:hover,
-      .sidebar-menu-item.active {
-        background-color: rgba(255, 255, 255, 0.05);
-        color: var(--text-white);
-      }
-
-      .sidebar-menu-item.active {
-        border-left: 3px solid var(--primary);
-      }
-
-      .sidebar-menu-item i {
-        width: 20px;
-        text-align: center;
-        font-size: 16px;
-      }
-
-      .category-name {
-        font-size: 14px;
-        font-weight: 500;
-      }
-
-      .badge {
-        position: absolute;
-        right: 20px;
-        background-color: var(--primary-light);
-        color: var(--text-white);
-        font-size: 11px;
-        padding: 1px 8px;
-        border-radius: 10px;
-        font-weight: 600;
-      }
-
-      /* Main Email Content */
-      .email-content {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        height: calc(100vh - 70px);
-      }
-
-      .email-toolbar {
-        padding: 15px 20px;
-        border-bottom: 1px solid var(--border-light);
-        display: flex;
-        align-items: center;
-        gap: 15px;
-      }
-
-      .toolbar-actions {
-        display: flex;
-        gap: 10px;
-      }
-
-      .toolbar-btn {
-        background-color: transparent;
-        border: none;
-        color: var(--text-light);
-        font-size: 14px;
-        cursor: pointer;
-        padding: 6px 10px;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-      }
-
-      .toolbar-btn:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-        color: var(--text-white);
-      }
-
-      .toolbar-btn i {
-        margin-right: 5px;
-      }
-
-      .toolbar-separator {
-        width: 1px;
-        height: 20px;
-        background-color: var(--border-light);
-      }
-
-      .toolbar-filter {
-        margin-left: auto;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .filter-label {
-        color: var(--text-lighter);
-        font-size: 13px;
-      }
-
-      .filter-select {
-        background-color: rgba(255, 255, 255, 0.05);
-        border: 1px solid var(--border-light);
-        color: var(--text-light);
-        padding: 6px 10px;
-        border-radius: 4px;
-        font-size: 13px;
-      }
-
-      /* Email List */
-      .email-list {
-        flex-grow: 1;
-        overflow-y: auto;
-      }
-
-      .email-item {
-        padding: 15px 20px;
-        border-bottom: 1px solid var(--border-light);
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .email-item:hover {
-        background-color: rgba(255, 255, 255, 0.02);
-      }
-
-      .email-item.unread {
-        background-color: var(--unread-bg);
-      }
-
-      .email-checkbox {
-        width: 18px;
-        height: 18px;
-        border-radius: 3px;
-        border: 1px solid var(--border-light);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-      }
-
-      .email-checkbox.checked {
-        background-color: var(--primary);
-        border-color: var(--primary);
-      }
-
-      .email-checkbox.checked i {
-        color: white;
-        font-size: 11px;
-      }
-
-      .email-star {
-        color: var(--text-lighter);
-        cursor: pointer;
-        font-size: 16px;
-      }
-
-      .email-star.starred {
-        color: #ffd700;
-      }
-
-      .email-sender {
-        width: 200px;
-        font-weight: 500;
-        color: var(--text-white);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .email-content-preview {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        width: calc(100% - 350px);
-      }
-
-      .email-subject {
-        color: var(--text-white);
-        font-weight: 500;
-      }
-
-      .email-body-preview {
-        color: var(--text-lighter);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        font-size: 13px;
-      }
-
-      .email-metadata {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-width: 100px;
-      }
-
-      .email-time {
-        color: var(--text-lighter);
-        font-size: 12px;
-      }
-
-      .email-category-tag {
-        padding: 2px 8px;
-        background: linear-gradient(
-          135deg,
-          rgba(101, 40, 247, 0.2),
-          rgba(25, 184, 255, 0.2)
-        );
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-      }
-
-      .gradient-text {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      /* Stats cards */
-      .stats-container {
-        display: flex;
-        gap: 20px;
-        padding: 20px;
-        margin-bottom: 10px;
-      }
-
-      .stat-card {
-        flex: 1;
-        background-color: var(--card-bg);
-        border-radius: 12px;
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-      }
-
-      .stat-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
-        background: linear-gradient(
-          135deg,
-          rgba(101, 40, 247, 0.1),
-          rgba(25, 184, 255, 0.1)
-        );
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .stat-icon i {
-        font-size: 20px;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      .stat-info {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .stat-value {
-        font-size: 24px;
-        font-weight: 700;
-        color: var(--text-white);
-      }
-
-      .stat-label {
-        font-size: 13px;
-        color: var(--text-lighter);
-      }
-
-      /* Empty States */
-      .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        padding: 40px;
-        text-align: center;
-      }
-
-      .empty-state-icon {
-        font-size: 48px;
-        margin-bottom: 20px;
-        opacity: 0.6;
-      }
-
-      .empty-state-title {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 10px;
-      }
-
-      .empty-state-description {
-        color: var(--text-lighter);
-        max-width: 400px;
-        margin-bottom: 30px;
-      }
-
-      /* Responsive Design */
-      @media (max-width: 1200px) {
-        .email-sender {
-          width: 150px;
-        }
-
-        .email-content-preview {
-          width: calc(100% - 300px);
-        }
-      }
-
-      @media (max-width: 992px) {
-        .sidebar {
-          width: 70px;
-        }
-
-        .sidebar-menu-item {
-          padding: 12px;
-          justify-content: center;
-        }
-
-        .category-name,
-        .sidebar-title,
-        .badge {
-          display: none;
-        }
-
-        .compose-btn {
-          width: 45px;
-          height: 45px;
-          padding: 0;
-          margin: 10px auto 20px;
-          justify-content: center;
-        }
-
-        .compose-btn span {
-          display: none;
-        }
-
-        .email-sender {
-          width: 120px;
-        }
-
-        .email-content-preview {
-          width: calc(100% - 250px);
-        }
-      }
-
-      @media (max-width: 768px) {
-        .header-search {
-          display: none;
-        }
-
-        .stats-container {
-          flex-direction: column;
-        }
-
-        .email-toolbar {
-          flex-wrap: wrap;
-        }
-
-        .toolbar-filter {
-          margin-left: 0;
-          margin-top: 10px;
-          width: 100%;
-        }
-
-        .email-sender {
-          width: 80px;
-        }
-
-        .email-content-preview {
-          width: calc(100% - 200px);
-        }
-
-        .email-category-tag {
-          display: none;
-        }
-      }
-
-      @media (max-width: 576px) {
-        .sidebar {
-          display: none;
-        }
-
-        .user-name {
-          display: none;
-        }
-      }
-
-      /* Animation effects */
-      @keyframes fadeIn {
+      /* Animations */
+      @keyframes fadeInUp {
         from {
           opacity: 0;
-          transform: translateY(10px);
+          transform: translateY(30px);
         }
         to {
           opacity: 1;
@@ -629,55 +451,106 @@
         }
       }
 
-      .fade-in {
-        animation: fadeIn 0.3s ease forwards;
+      .fade-in-up {
+        animation: fadeInUp 0.6s ease forwards;
       }
 
-      /* Background Waves */
-      .wave-container {
-        position: fixed;
-        bottom: 0;
+      @keyframes pulseGlow {
+        0% {
+          box-shadow: 0 0 0 0 rgba(101, 40, 247, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 20px rgba(101, 40, 247, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(101, 40, 247, 0);
+        }
+      }
+
+      .pulse-glow {
+        animation: pulseGlow 2s infinite;
+      }
+
+      /* Background Effects */
+      .background-orbs {
+        position: absolute;
+        top: 0;
         left: 0;
         width: 100%;
-        height: 100px;
-        overflow: hidden;
+        height: 100%;
+        pointer-events: none;
         z-index: -1;
       }
 
-      .wave {
+      .orb {
         position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 100px;
-        background-size: 1440px 100px;
-        background-repeat: repeat-x;
-        animation: wave-animation 25s linear infinite;
-      }
-
-      .wave-1 {
-        bottom: 0;
+        border-radius: 50%;
+        filter: blur(60px);
         opacity: 0.3;
-        height: 80px;
-        animation-duration: 20s;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%236528F7' fill-opacity='0.2' d='M0,64L48,80C96,96,192,128,288,128C384,128,480,96,576,90.7C672,85,768,107,864,144C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
       }
 
-      .wave-2 {
-        bottom: 10px;
-        opacity: 0.2;
-        height: 60px;
-        animation-duration: 17s;
-        animation-direction: reverse;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2319B8FF' fill-opacity='0.2' d='M0,256L48,261.3C96,267,192,277,288,266.7C384,256,480,224,576,213.3C672,203,768,213,864,208C960,203,1056,181,1152,186.7C1248,192,1344,224,1392,240L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+      .orb-1 {
+        background-color: var(--primary);
+        width: 200px;
+        height: 200px;
+        top: 10%;
+        right: 10%;
+        animation: float 6s ease-in-out infinite;
       }
 
-      @keyframes wave-animation {
-        0% {
-          background-position-x: 0;
+      .orb-2 {
+        background-color: var(--secondary);
+        width: 150px;
+        height: 150px;
+        bottom: 20%;
+        left: 15%;
+        animation: float 8s ease-in-out infinite reverse;
+      }
+
+      @keyframes float {
+        0%, 100% {
+          transform: translateY(0px);
         }
-        100% {
-          background-position-x: 1440px;
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .welcome-section {
+          padding: 20px;
+        }
+
+        .welcome-title {
+          font-size: 2rem;
+        }
+
+        .quick-stats {
+          gap: 20px;
+        }
+
+        .steps-container {
+          grid-template-columns: 1fr;
+        }
+
+        .help-links {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .upload-zone {
+          padding: 40px 20px;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .progress-indicator {
+          display: none;
+        }
+
+        .header-container {
+          padding: 0 15px;
         }
       }
     </style>
@@ -686,449 +559,316 @@
     <header>
       <div class="header-container">
         <a href="#" class="logo">
-          <i class="fas fa-inbox"></i>
-          InboxIQ
+          <i class="fas fa-cloud-upload-alt"></i>
+          FileFlow
         </a>
 
-        <div class="header-search">
-          <i class="fas fa-search search-icon"></i>
-          <input
-            type="text"
-            class="search-input"
-            placeholder="Search emails, documents, or apps..."
-          />
-        </div>
-
-        <div class="user-menu">
-          <button class="notification-btn">
-            <i class="far fa-bell"></i>
-            <span class="notification-dot"></span>
-          </button>
-
-          <div class="user-profile">
-            <div class="user-avatar">EM</div>
-            <span class="user-name">Emma Jones</span>
-            <i
-              class="fas fa-chevron-down"
-              style="font-size: 12px; color: var(--text-lighter)"
-            ></i>
+        <div class="welcome-message">
+          <span class="welcome-text">Welcome! Let's get you started</span>
+          <div class="progress-indicator">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span class="progress-text" id="progressText">1 of 3 steps</span>
           </div>
         </div>
       </div>
     </header>
 
     <div class="main-container">
-      <div class="sidebar">
-        <div class="sidebar-section">
-          <h3 class="sidebar-title">Smart Categories</h3>
-          <ul class="sidebar-menu">
-            <li class="sidebar-menu-item">
-              <i class="fas fa-briefcase"></i>
-              <span class="category-name">Work</span>
-              <span class="badge">5</span>
-            </li>
-            <li class="sidebar-menu-item">
-              <i class="fas fa-code"></i>
-              <span class="category-name">Development</span>
-              <span class="badge">2</span>
-            </li>
-            <li class="sidebar-menu-item">
-              <i class="fas fa-paint-brush"></i>
-              <span class="category-name">Design</span>
-              <span class="badge">2</span>
-            </li>
-            <li class="sidebar-menu-item">
-              <i class="fas fa-cloud"></i>
-              <span class="category-name">Cloud</span>
-              <span class="badge">2</span>
-            </li>
-          </ul>
+      <div class="welcome-section">
+        <div class="background-orbs">
+          <div class="orb orb-1"></div>
+          <div class="orb orb-2"></div>
         </div>
 
-        <div class="sidebar-section">
-          <h3 class="sidebar-title">Documents</h3>
-          <ul class="sidebar-menu">
-            <li class="sidebar-menu-item">
-              <i class="fas fa-file-pdf" style="color: #ff6b6b"></i>
-              <span class="category-name">PDF</span>
-              <span class="badge">1</span>
-            </li>
-            <li class="sidebar-menu-item">
-              <i class="fas fa-file-word" style="color: #4ecdc4"></i>
-              <span class="category-name">DOCX</span>
-              <span class="badge">1</span>
-            </li>
-          </ul>
-        </div>
-      </div>
+        <div class="welcome-hero fade-in-up">
+          <h1 class="welcome-title">Welcome to FileFlow!</h1>
+          <p class="welcome-subtitle">
+            You're 3 simple steps away from secure, lightning-fast file sharing.
+            Let's get your account set up in under 2 minutes.
+          </p>
 
-      <div class="email-content">
-        <div class="stats-container">
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-inbox"></i>
+          <div class="quick-stats">
+            <div class="stat-item">
+              <span class="stat-number">0</span>
+              <span class="stat-label">Files Uploaded</span>
             </div>
-            <div class="stat-info">
-              <div class="stat-value">76%</div>
-              <div class="stat-label">Inbox Organized</div>
+            <div class="stat-item">
+              <span class="stat-number">5GB</span>
+              <span class="stat-label">Free Storage</span>
             </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-envelope-open"></i>
-            </div>
-            <div class="stat-info">
-              <div class="stat-value">0</div>
-              <div class="stat-label">Unread Emails</div>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-info">
-              <div class="stat-value">2.4</div>
-              <div class="stat-label">Hours Saved Weekly</div>
+            <div class="stat-item">
+              <span class="stat-number">∞</span>
+              <span class="stat-label">File Sharing</span>
             </div>
           </div>
         </div>
 
-        <div class="email-toolbar">
-          <div class="toolbar-actions">
-            <button class="toolbar-btn">
-              <i class="fas fa-chart-line"></i>
-              Analytics
-            </button>
-
-            <button class="toolbar-btn">
-              <i class="fas fa-chart-pie"></i>
-              Reports
-            </button>
-
-            <button class="toolbar-btn">
-              <i class="fas fa-calendar-alt"></i>
-              Calendar
-            </button>
+        <div class="getting-started fade-in-up">
+          <div class="steps-header">
+            <h2 class="steps-title">Get Started in 3 Easy Steps</h2>
+            <p class="steps-subtitle">Complete these steps to unlock the full power of FileFlow</p>
           </div>
 
-          <div class="toolbar-separator"></div>
-
-          <div class="toolbar-actions">
-            <button class="toolbar-btn">
-              <i class="fas fa-cog"></i>
-              Settings
-            </button>
-
-            <button class="toolbar-btn">
-              <i class="fas fa-question-circle"></i>
-              Help
-            </button>
-          </div>
-
-          <div class="toolbar-filter">
-            <span class="filter-label">Time range:</span>
-            <select class="filter-select">
-              <option>Last 7 days</option>
-              <option>Last 30 days</option>
-              <option>Last 90 days</option>
-              <option>Custom range</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="email-list">
-          <div style="padding: 20px">
-            <!-- Email Categories and Response Time -->
-            <div style="display: flex; gap: 20px; margin-bottom: 20px">
-              <!-- Email Categories Donut Chart -->
-              <div
-                style="
-                  background-color: var(--card-bg);
-                  border-radius: 12px;
-                  padding: 20px;
-                  flex: 1;
-                "
-              >
-                <h4
-                  style="font-size: 16px; font-weight: 600; margin-bottom: 15px"
-                >
-                  Email Categories
-                </h4>
-
-                <div style="display: flex; align-items: center">
-                  <!-- SVG Donut Chart -->
-                  <div style="width: 180px; height: 180px; position: relative">
-                    <svg width="180" height="180" viewBox="0 0 180 180">
-                      <circle
-                        cx="90"
-                        cy="90"
-                        r="80"
-                        fill="none"
-                        stroke="rgba(255,255,255,0.1)"
-                        stroke-width="16"
-                      />
-
-                      <!-- Segments -->
-                      <circle
-                        cx="90"
-                        cy="90"
-                        r="80"
-                        fill="none"
-                        stroke="#6528F7"
-                        stroke-width="16"
-                        stroke-dasharray="502.4 502.4"
-                        stroke-dashoffset="0"
-                        transform="rotate(-90, 90, 90)"
-                      />
-                      <circle
-                        cx="90"
-                        cy="90"
-                        r="80"
-                        fill="none"
-                        stroke="#19B8FF"
-                        stroke-width="16"
-                        stroke-dasharray="251.2 502.4"
-                        stroke-dashoffset="-251.2"
-                        transform="rotate(-90, 90, 90)"
-                      />
-                      <circle
-                        cx="90"
-                        cy="90"
-                        r="80"
-                        fill="none"
-                        stroke="#FF6B6B"
-                        stroke-width="16"
-                        stroke-dasharray="125.6 502.4"
-                        stroke-dashoffset="-376.8"
-                        transform="rotate(-90, 90, 90)"
-                      />
-                      <circle
-                        cx="90"
-                        cy="90"
-                        r="80"
-                        fill="none"
-                        stroke="#4ECDC4"
-                        stroke-width="16"
-                        stroke-dasharray="75.36 502.4"
-                        stroke-dashoffset="-452.16"
-                        transform="rotate(-90, 90, 90)"
-                      />
-                    </svg>
-                  </div>
-
-                  <!-- Legend -->
-                  <div style="margin-left: 20px">
-                    <div
-                      style="
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                        margin-bottom: 12px;
-                      "
-                    >
-                      <div
-                        style="
-                          width: 16px;
-                          height: 16px;
-                          border-radius: 4px;
-                          background-color: #6528f7;
-                        "
-                      ></div>
-                      <span style="font-size: 15px; color: var(--text-light)"
-                        >Work (50%)</span
-                      >
-                    </div>
-                    <div
-                      style="
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                        margin-bottom: 12px;
-                      "
-                    >
-                      <div
-                        style="
-                          width: 16px;
-                          height: 16px;
-                          border-radius: 4px;
-                          background-color: #19b8ff;
-                        "
-                      ></div>
-                      <span style="font-size: 15px; color: var(--text-light)"
-                        >Design (25%)</span
-                      >
-                    </div>
-                    <div
-                      style="
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                        margin-bottom: 12px;
-                      "
-                    >
-                      <div
-                        style="
-                          width: 16px;
-                          height: 16px;
-                          border-radius: 4px;
-                          background-color: #ff6b6b;
-                        "
-                      ></div>
-                      <span style="font-size: 15px; color: var(--text-light)"
-                        >Development (15%)</span
-                      >
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px">
-                      <div
-                        style="
-                          width: 16px;
-                          height: 16px;
-                          border-radius: 4px;
-                          background-color: #4ecdc4;
-                        "
-                      ></div>
-                      <span style="font-size: 15px; color: var(--text-light)"
-                        >Cloud (10%)</span
-                      >
-                    </div>
-                  </div>
-                </div>
+          <div class="steps-container">
+            <div class="step-card" id="step1" onclick="completeStep(1)">
+              <div class="step-number">1</div>
+              <div class="step-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
               </div>
-
-              <!-- Average Response Time -->
-              <div
-                style="
-                  background-color: var(--card-bg);
-                  border-radius: 12px;
-                  padding: 20px;
-                  flex: 1;
-                "
-              >
-                <h4
-                  style="font-size: 16px; font-weight: 600; margin-bottom: 15px"
-                >
-                  Response Time
-                </h4>
-
-                <div
-                  style="
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    height: 80%;
-                  "
-                >
-                  <div style="text-align: center; margin-bottom: 20px">
-                    <div
-                      style="
-                        font-size: 48px;
-                        font-weight: 700;
-                        background: linear-gradient(
-                          135deg,
-                          var(--primary),
-                          var(--secondary)
-                        );
-                        -webkit-background-clip: text;
-                        background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                      "
-                    >
-                      2.4h
-                    </div>
-                    <div style="font-size: 16px; color: var(--text-lighter)">
-                      Average response time
-                    </div>
-                  </div>
-
-                  <!-- Progress bars -->
-                  <div style="margin-bottom: 20px">
-                    <div
-                      style="
-                        display: flex;
-                        justify-content: space-between;
-                        margin-bottom: 8px;
-                      "
-                    >
-                      <span style="font-size: 14px; color: var(--text-lighter)"
-                        >Work emails</span
-                      >
-                      <span style="font-size: 14px; color: var(--text-lighter)"
-                        >1.8h</span
-                      >
-                    </div>
-                    <div
-                      style="
-                        height: 10px;
-                        background-color: rgba(255, 255, 255, 0.1);
-                        border-radius: 5px;
-                        overflow: hidden;
-                      "
-                    >
-                      <div
-                        style="
-                          height: 100%;
-                          width: 75%;
-                          background: linear-gradient(
-                            90deg,
-                            var(--primary),
-                            var(--primary-light)
-                          );
-                        "
-                      ></div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div
-                      style="
-                        display: flex;
-                        justify-content: space-between;
-                        margin-bottom: 8px;
-                      "
-                    >
-                      <span style="font-size: 14px; color: var(--text-lighter)"
-                        >Personal emails</span
-                      >
-                      <span style="font-size: 14px; color: var(--text-lighter)"
-                        >3.5h</span
-                      >
-                    </div>
-                    <div
-                      style="
-                        height: 10px;
-                        background-color: rgba(255, 255, 255, 0.1);
-                        border-radius: 5px;
-                        overflow: hidden;
-                      "
-                    >
-                      <div
-                        style="
-                          height: 100%;
-                          width: 45%;
-                          background: linear-gradient(
-                            90deg,
-                            var(--secondary),
-                            #5ce0ff
-                          );
-                        "
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <h3 class="step-title">Upload Your First File</h3>
+              <p class="step-description">
+                Drag & drop any file or click to browse. We support all file types up to 5GB.
+              </p>
+              <button class="step-action pulse-glow" onclick="showUploadZone(event)">
+                Upload Now
+              </button>
             </div>
+
+            <div class="step-card" id="step2">
+              <div class="step-number">2</div>
+              <div class="step-icon">
+                <i class="fas fa-share-alt"></i>
+              </div>
+              <h3 class="step-title">Share Your First Link</h3>
+              <p class="step-description">
+                Generate a secure sharing link with custom permissions and expiration dates.
+              </p>
+              <button class="step-action" disabled>
+                Complete Step 1 First
+              </button>
+            </div>
+
+            <div class="step-card" id="step3">
+              <div class="step-number">3</div>
+              <div class="step-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <h3 class="step-title">Invite Your Team</h3>
+              <p class="step-description">
+                Add team members and start collaborating with advanced permission controls.
+              </p>
+              <button class="step-action" disabled>
+                Coming Soon
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="upload-zone hidden" id="uploadZone">
+          <div class="upload-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
+          </div>
+          <div class="upload-text">Drop your files here</div>
+          <div class="upload-subtext">or click to browse from your computer</div>
+          <button class="upload-button" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-plus"></i>
+            Choose Files
+          </button>
+          <input type="file" id="fileInput" multiple style="display: none;">
+        </div>
+
+        <div class="help-section fade-in-up">
+          <h3 class="help-title">
+            <i class="fas fa-question-circle"></i>
+            Need Help Getting Started?
+          </h3>
+          <div class="help-links">
+            <a href="#" class="help-link">
+              <i class="fas fa-play"></i>
+              Watch Quick Tutorial
+            </a>
+            <a href="#" class="help-link">
+              <i class="fas fa-book"></i>
+              Read Documentation
+            </a>
+            <a href="#" class="help-link">
+              <i class="fas fa-comments"></i>
+              Live Chat Support
+            </a>
+            <a href="#" class="help-link">
+              <i class="fas fa-envelope"></i>
+              Email Support
+            </a>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="wave-container">
-      <div class="wave wave-1"></div>
-      <div class="wave wave-2"></div>
+    <div class="progress-toast" id="progressToast">
+      <div class="toast-content">
+        <div class="toast-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="toast-text">Great! Step completed successfully.</div>
+      </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+      let currentStep = 1;
+      let completedSteps = 0;
+
+      function updateProgress() {
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        
+        const percentage = (completedSteps / 3) * 100;
+        progressFill.style.width = percentage + '%';
+        progressText.textContent = `${completedSteps} of 3 steps`;
+      }
+
+      function showUploadZone(event) {
+        event.stopPropagation();
+        const uploadZone = document.getElementById('uploadZone');
+        uploadZone.classList.remove('hidden');
+        uploadZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      function completeStep(stepNumber) {
+        const stepCard = document.getElementById(`step${stepNumber}`);
+        
+        if (!stepCard.classList.contains('completed')) {
+          stepCard.classList.add('completed');
+          completedSteps++;
+          updateProgress();
+          showToast();
+          
+          // Enable next step
+          if (stepNumber < 3) {
+            const nextStep = document.getElementById(`step${stepNumber + 1}`);
+            const nextButton = nextStep.querySelector('.step-action');
+            nextButton.disabled = false;
+            nextButton.textContent = stepNumber === 1 ? 'Create Share Link' : 'Invite Team';
+            nextButton.classList.add('pulse-glow');
+          }
+          
+          // Update step content
+          const stepAction = stepCard.querySelector('.step-action');
+          stepAction.innerHTML = '<i class="fas fa-check"></i> Completed';
+          stepAction.disabled = true;
+        }
+      }
+
+      function showToast() {
+        const toast = document.getElementById('progressToast');
+        toast.style.display = 'block';
+        
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 3000);
+      }
+
+      // File upload handling
+      const fileInput = document.getElementById('fileInput');
+      const uploadZone = document.getElementById('uploadZone');
+
+      fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+          handleFileUpload(this.files);
+        }
+      });
+
+      // Drag and drop functionality
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+      });
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        uploadZone.addEventListener(eventName, highlight, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        uploadZone.addEventListener(eventName, unhighlight, false);
+      });
+
+      uploadZone.addEventListener('drop', handleDrop, false);
+      uploadZone.addEventListener('click', () => fileInput.click());
+
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      function highlight(e) {
+        uploadZone.classList.add('dragover');
+      }
+
+      function unhighlight(e) {
+        uploadZone.classList.remove('dragover');
+      }
+
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFileUpload(files);
+      }
+
+      function handleFileUpload(files) {
+        console.log('Files uploaded:', files);
+        
+        // Simulate upload process
+        uploadZone.innerHTML = `
+          <div class="upload-icon">
+            <i class="fas fa-spinner fa-spin"></i>
+          </div>
+          <div class="upload-text">Uploading ${files.length} file(s)...</div>
+          <div class="upload-subtext">Please wait while we securely upload your files</div>
+        `;
+        
+        // Simulate upload completion
+        setTimeout(() => {
+          uploadZone.innerHTML = `
+            <div class="upload-icon" style="color: var(--success)">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="upload-text">Upload Successful!</div>
+            <div class="upload-subtext">${files.length} file(s) uploaded and ready to share</div>
+            <button class="upload-button" onclick="completeStep(1); enableSharing()">
+              <i class="fas fa-share-alt"></i>
+              Create Share Link
+            </button>
+          `;
+        }, 2000);
+      }
+
+      function enableSharing() {
+        const step2 = document.getElementById('step2');
+        const step2Button = step2.querySelector('.step-action');
+        step2Button.disabled = false;
+        step2Button.textContent = 'Create Share Link';
+        step2Button.onclick = () => {
+          alert('Share link created! https://fileflow.app/s/abc123');
+          completeStep(2);
+        };
+      }
+
+      // Add some interactive animations
+      document.addEventListener('DOMContentLoaded', function() {
+        // Animate stats counting up
+        const statNumbers = document.querySelectorAll('.stat-number');
+        statNumbers.forEach((stat, index) => {
+          if (stat.textContent !== '∞') {
+            let start = 0;
+            const end = parseInt(stat.textContent);
+            const duration = 1000;
+            const increment = end / (duration / 16);
+            
+            function updateCount() {
+              start += increment;
+              if (start < end) {
+                stat.textContent = Math.floor(start);
+                requestAnimationFrame(updateCount);
+              } else {
+                stat.textContent = end + (stat.textContent.includes('GB') ? 'GB' : '');
+              }
+            }
+            
+            setTimeout(updateCount, index * 200);
+          }
+        });
+      });
+    </script>
   </body>
 </html>
