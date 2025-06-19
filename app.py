@@ -77,7 +77,7 @@ def login():
         "?response_type=code"
         f"&client_id={GOOGLE_CLIENT_ID}"
         "&redirect_uri=https://inboxiq.onrender.com/auth/callback"
-        "&scope=openid%20email%20profile%20https://mail.google.com/"
+        "&scope=openid%20email%20profile%20https://www.googleapis.com/auth/drive"
         "&access_type=offline"
         "&prompt=consent"
     )
