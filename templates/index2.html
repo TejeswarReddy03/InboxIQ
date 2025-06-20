@@ -167,7 +167,14 @@
             padding: 16px 12px;
         }
 
-        .new-btn {
+        .sidebar-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .new-btn, .upload-btn {
             display: flex;
             align-items: center;
             gap: 12px;
@@ -176,7 +183,6 @@
             border: 1px solid var(--border);
             border-radius: 24px;
             cursor: pointer;
-            margin-bottom: 24px;
             transition: all 0.2s;
             box-shadow: var(--shadow);
             font-size: 14px;
@@ -184,12 +190,12 @@
             text-decoration: none;
         }
 
-        .new-btn:hover {
+        .new-btn:hover, .upload-btn:hover {
             box-shadow: var(--shadow-hover);
             background: var(--surface);
         }
 
-        .new-btn i {
+        .new-btn i, .upload-btn i {
             font-size: 20px;
             color: var(--secondary-green);
         }
@@ -335,6 +341,174 @@
 
         .action-btn-secondary:hover {
             background: var(--surface);
+        }
+
+        /* Upload Modal */
+        .upload-modal {
+            background: var(--background);
+            border-radius: 8px;
+            box-shadow: var(--shadow-hover);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        .upload-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .upload-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .upload-body {
+            padding: 24px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 48px 24px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: var(--surface);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-green);
+            background: var(--light-green);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary-green);
+            background: var(--light-green);
+            border-style: solid;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: var(--text-light);
+            margin-bottom: 16px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .upload-subtext {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .upload-browse-btn {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .upload-browse-btn:hover {
+            background: var(--primary-green-hover);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-progress {
+            margin-top: 24px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-green);
+            border-radius: 4px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .uploaded-files {
+            margin-top: 24px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--surface);
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .file-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-green);
+            color: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .file-status {
+            font-size: 12px;
+            color: var(--primary-green);
+            font-weight: 500;
+        }
+
+        .upload-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
         }
 
         /* Text Editor Modal */
@@ -598,11 +772,21 @@
                 padding: 12px;
             }
 
+            .sidebar-buttons {
+                flex-direction: row;
+                gap: 8px;
+            }
+
+            .new-btn, .upload-btn {
+                flex: 1;
+                justify-content: center;
+            }
+
             .content {
                 padding: 16px;
             }
 
-            .text-editor-modal {
+            .text-editor-modal, .upload-modal {
                 width: 95%;
                 margin: 20px;
             }
@@ -674,10 +858,16 @@
     <div class="main-container">
         <!-- Sidebar -->
         <div class="sidebar">
-            <button class="new-btn" onclick="openTextEditor()">
-                <i class="fas fa-plus"></i>
-                New
-            </button>
+            <div class="sidebar-buttons">
+                <button class="new-btn" onclick="openTextEditor()">
+                    <i class="fas fa-plus"></i>
+                    New
+                </button>
+                <button class="upload-btn" onclick="openUploadModal()">
+                    <i class="fas fa-upload"></i>
+                    Upload
+                </button>
+            </div>
             
             <ul class="sidebar-menu">
                 <li class="menu-item">
@@ -718,18 +908,56 @@
                 <h1 class="welcome-title">Welcome to InboxIQ Drive</h1>
                 <p class="welcome-subtitle">
                     Start creating and sharing your documents. Click "New" to create your first document,
-                    or explore the features to see what you can do with InboxIQ Drive.
+                    or "Upload" to add existing files. Explore the features to see what you can do with InboxIQ Drive.
                 </p>
                 <div class="welcome-actions">
                     <button class="action-btn action-btn-primary" onclick="openTextEditor()">
                         <i class="fas fa-plus"></i>
                         Create New Document
                     </button>
-                    <a href="#" class="action-btn action-btn-secondary">
-                        <i class="fas fa-info-circle"></i>
-                        Learn More
-                    </a>
+                    <button class="action-btn action-btn-secondary" onclick="openUploadModal()">
+                        <i class="fas fa-upload"></i>
+                        Upload Files
+                    </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="upload-modal">
+            <div class="upload-header">
+                <div class="upload-title">Upload Files</div>
+                <button class="close-btn" onclick="closeUploadModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="upload-body">
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="upload-text">Drag and drop files here</div>
+                    <div class="upload-subtext">or click to browse from your computer</div>
+                    <button class="upload-browse-btn">Browse Files</button>
+                </div>
+                
+                <input type="file" id="fileInput" class="file-input" multiple onchange="handleFileSelect(event)">
+                
+                <div class="upload-progress" id="uploadProgress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Uploading...</div>
+                </div>
+                
+                <div class="uploaded-files" id="uploadedFiles"></div>
+            </div>
+            
+            <div class="upload-actions">
+                <button class="editor-btn editor-btn-secondary" onclick="closeUploadModal()">Close</button>
             </div>
         </div>
     </div>
@@ -751,7 +979,6 @@
             </div>
             
             <div class="editor-body">
-                
                 <textarea class="text-editor" id="textContent" placeholder="Start typing your document..." oninput="updateContent()"></textarea>
             </div>
             
@@ -785,7 +1012,6 @@
                     <label class="share-label" for="shareEmail">Email address</label>
                     <input type="email" class="share-input" id="shareEmail" placeholder="Enter email address" onkeypress="handleEmailKeypress(event)">
                 </div>
-                
             </div>
             
             <div class="share-actions">
@@ -805,6 +1031,9 @@
             shared: false
         };
 
+        let uploadedFiles = [];
+
+        // Text Editor Functions
         function openTextEditor() {
             document.getElementById('editorModal').classList.add('active');
             document.getElementById('textContent').focus();
@@ -816,18 +1045,11 @@
         }
 
         function resetEditor() {
-            document.getElementById('documentTitle').value = '';
             document.getElementById('textContent').value = '';
             document.getElementById('shareBtn').disabled = true;
             updateWordCount();
             currentDocument = { title: '', content: '', shared: false };
-        }
-
-        function updateTitle() {
-            const title = document.getElementById('documentTitle').value;
-            currentDocument.title = title;
-            document.querySelector('.editor-title').textContent = title || 'Untitled Document';
-            checkShareEnabled();
+            document.querySelector('.editor-title').textContent = 'Untitled Document';
         }
 
         function updateContent() {
@@ -849,7 +1071,6 @@
         }
 
         function saveDocument() {
-            // Simulate saving
             const saveBtn = event.target;
             const originalText = saveBtn.innerHTML;
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
@@ -864,6 +1085,144 @@
             }, 1000);
         }
 
+        // Upload Functions
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+            resetUpload();
+        }
+
+        function resetUpload() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('uploadProgress').style.display = 'none';
+            document.getElementById('uploadedFiles').innerHTML = '';
+            document.getElementById('progressFill').style.width = '0%';
+            uploadedFiles = [];
+        }
+
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            processFiles(files);
+        }
+
+        function processFiles(files) {
+            if (files.length === 0) return;
+
+            // Show progress
+            document.getElementById('uploadProgress').style.display = 'block';
+            
+            // Simulate upload process
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 30;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    completeUpload(files);
+                }
+                document.getElementById('progressFill').style.width = progress + '%';
+                document.getElementById('progressText').textContent = `Uploading... ${Math.round(progress)}%`;
+            }, 200);
+        }
+
+        function completeUpload(files) {
+            setTimeout(() => {
+                document.getElementById('uploadProgress').style.display = 'none';
+                displayUploadedFiles(files);
+                uploadedFiles = [...uploadedFiles, ...files];
+            }, 500);
+        }
+
+        function displayUploadedFiles(files) {
+            const container = document.getElementById('uploadedFiles');
+            
+            files.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                const fileIcon = getFileIcon(fileExtension);
+                
+                fileItem.innerHTML = `
+                    <div class="file-icon">
+                        <i class="${fileIcon}"></i>
+                    </div>
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${formatFileSize(file.size)}</div>
+                    </div>
+                    <div class="file-status">Uploaded</div>
+                `;
+                
+                container.appendChild(fileItem);
+            });
+        }
+
+        function getFileIcon(extension) {
+            const iconMap = {
+                'pdf': 'fas fa-file-pdf',
+                'doc': 'fas fa-file-word',
+                'docx': 'fas fa-file-word',
+                'xls': 'fas fa-file-excel',
+                'xlsx': 'fas fa-file-excel',
+                'ppt': 'fas fa-file-powerpoint',
+                'pptx': 'fas fa-file-powerpoint',
+                'txt': 'fas fa-file-alt',
+                'jpg': 'fas fa-file-image',
+                'jpeg': 'fas fa-file-image',
+                'png': 'fas fa-file-image',
+                'gif': 'fas fa-file-image',
+                'mp4': 'fas fa-file-video',
+                'mp3': 'fas fa-file-audio',
+                'zip': 'fas fa-file-archive',
+                'rar': 'fas fa-file-archive'
+            };
+            return iconMap[extension] || 'fas fa-file';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Drag and Drop
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => {
+                    uploadArea.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => {
+                    uploadArea.classList.remove('dragover');
+                }, false);
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                const files = Array.from(e.dataTransfer.files);
+                processFiles(files);
+            }, false);
+        }
+
+        // Share Functions
         function openShareModal() {
             if (!currentDocument.content.trim()) {
                 alert('Please add some content before sharing.');
@@ -876,7 +1235,6 @@
         function closeShareModal() {
             document.getElementById('shareModal').classList.remove('active');
             document.getElementById('shareEmail').value = '';
-            document.getElementById('shareMessage').value = '';
             document.getElementById('successMessage').classList.remove('show');
         }
 
@@ -888,7 +1246,6 @@
 
         function shareDocument() {
             const email = document.getElementById('shareEmail').value.trim();
-            const message = document.getElementById('shareMessage').value.trim();
             
             if (!email) {
                 alert('Please enter an email address.');
@@ -900,7 +1257,6 @@
                 return;
             }
             
-            // Simulate sharing process
             const shareBtn = event.target;
             const originalText = shareBtn.innerHTML;
             shareBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sharing...';
@@ -912,15 +1268,11 @@
                 shareBtn.innerHTML = originalText;
                 shareBtn.disabled = false;
                 
-                // Auto close after 2 seconds
                 setTimeout(() => {
                     closeShareModal();
                 }, 2000);
                 
                 console.log('Document shared with:', email);
-                console.log('Message:', message);
-                console.log('Document title:', currentDocument.title || 'Untitled Document');
-                console.log('Document content preview:', currentDocument.content.substring(0, 100) + '...');
             }, 1500);
         }
 
@@ -929,10 +1281,11 @@
             return emailRegex.test(email);
         }
 
-        // Close modals when clicking outside
+        // Event Listeners
         document.addEventListener('click', function(event) {
             const editorModal = document.getElementById('editorModal');
             const shareModal = document.getElementById('shareModal');
+            const uploadModal = document.getElementById('uploadModal');
             
             if (event.target === editorModal) {
                 closeTextEditor();
@@ -941,16 +1294,22 @@
             if (event.target === shareModal) {
                 closeShareModal();
             }
+
+            if (event.target === uploadModal) {
+                closeUploadModal();
+            }
         });
 
-        // Handle escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 const editorModal = document.getElementById('editorModal');
                 const shareModal = document.getElementById('shareModal');
+                const uploadModal = document.getElementById('uploadModal');
                 
                 if (shareModal.classList.contains('active')) {
                     closeShareModal();
+                } else if (uploadModal.classList.contains('active')) {
+                    closeUploadModal();
                 } else if (editorModal.classList.contains('active')) {
                     closeTextEditor();
                 }
@@ -960,6 +1319,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             updateWordCount();
+            setupDragAndDrop();
         });
     </script>
 </body>
