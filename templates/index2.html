@@ -503,6 +503,37 @@
             font-weight: 500;
         }
 
+        .email-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .email-input-group {
+            margin-bottom: 16px;
+        }
+
+        .email-label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .email-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .email-input:focus {
+            border-color: var(--primary-green);
+        }
+
         .upload-actions {
             display: flex;
             justify-content: flex-end;
@@ -736,6 +767,70 @@
             display: block;
         }
 
+        /* Notification Popup */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: var(--shadow-hover);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            min-width: 300px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-green);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .notification-message {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .notification-close:hover {
+            color: var(--text-secondary);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .header {
@@ -804,6 +899,12 @@
                 width: 100%;
                 max-width: 300px;
                 justify-content: center;
+            }
+
+            .notification {
+                right: 10px;
+                min-width: 280px;
+                transform: translateX(300px);
             }
         }
 
@@ -954,10 +1055,21 @@
                 </div>
                 
                 <div class="uploaded-files" id="uploadedFiles"></div>
+                
+                <div class="email-section" id="emailSection" style="display: none;">
+                    <div class="email-input-group">
+                        <label class="email-label" for="uploadEmail">Share to email</label>
+                        <input type="email" class="email-input" id="uploadEmail" placeholder="Enter email address to share files">
+                    </div>
+                </div>
             </div>
             
             <div class="upload-actions">
                 <button class="editor-btn editor-btn-secondary" onclick="closeUploadModal()">Close</button>
+                <button class="editor-btn editor-btn-primary" id="shareFilesBtn" onclick="shareUploadedFiles()" style="display: none;">
+                    <i class="fas fa-paper-plane"></i>
+                    Share Files
+                </button>
             </div>
         </div>
     </div>
@@ -966,7 +1078,7 @@
     <div class="modal-overlay" id="editorModal">
         <div class="text-editor-modal">
             <div class="editor-header">
-                <div class="editor-title"> Document</div>
+                <div class="editor-title">Untitled Document</div>
                 <div class="editor-actions">
                     <button class="editor-btn editor-btn-primary" id="shareBtn" onclick="openShareModal()" disabled>
                         <i class="fas fa-share-alt"></i>
@@ -1022,6 +1134,20 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <!-- Notification Popup -->
+    <div class="notification" id="notification">
+        <div class="notification-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <div class="notification-content">
+            <div class="notification-title" id="notificationTitle">Success</div>
+            <div class="notification-message" id="notificationMessage">Files shared successfully!</div>
+        </div>
+        <button class="notification-close" onclick="hideNotification()">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
 
     <script>
@@ -1099,7 +1225,10 @@
             document.getElementById('fileInput').value = '';
             document.getElementById('uploadProgress').style.display = 'none';
             document.getElementById('uploadedFiles').innerHTML = '';
+            document.getElementById('emailSection').style.display = 'none';
+            document.getElementById('shareFilesBtn').style.display = 'none';
             document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('uploadEmail').value = '';
             uploadedFiles = [];
         }
 
@@ -1132,6 +1261,8 @@
             setTimeout(() => {
                 document.getElementById('uploadProgress').style.display = 'none';
                 displayUploadedFiles(files);
+                document.getElementById('emailSection').style.display = 'block';
+                document.getElementById('shareFilesBtn').style.display = 'inline-flex';
                 uploadedFiles = [...uploadedFiles, ...files];
             }, 500);
         }
@@ -1159,6 +1290,43 @@
                 
                 container.appendChild(fileItem);
             });
+        }
+
+        function shareUploadedFiles() {
+            const email = document.getElementById('uploadEmail').value.trim();
+            
+            if (!email) {
+                showNotification('No email provided', 'Files uploaded successfully but not shared via email.', 'info');
+                setTimeout(() => {
+                    closeUploadModal();
+                }, 2000);
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            const shareBtn = document.getElementById('shareFilesBtn');
+            const originalText = shareBtn.innerHTML;
+            shareBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sharing...';
+            shareBtn.disabled = true;
+            
+            setTimeout(() => {
+                const fileCount = uploadedFiles.length;
+                const fileText = fileCount === 1 ? 'file' : 'files';
+                showNotification('Files Shared!', `${fileCount} ${fileText} shared successfully with ${email}`);
+                
+                shareBtn.innerHTML = originalText;
+                shareBtn.disabled = false;
+                
+                setTimeout(() => {
+                    closeUploadModal();
+                }, 2000);
+                
+                console.log(`Files shared with: ${email}`, uploadedFiles);
+            }, 1500);
         }
 
         function getFileIcon(extension) {
@@ -1264,13 +1432,13 @@
             
             setTimeout(() => {
                 currentDocument.shared = true;
-                document.getElementById('successMessage').classList.add('show');
+                showNotification('Document Shared!', `Document shared successfully with ${email}`);
                 shareBtn.innerHTML = originalText;
                 shareBtn.disabled = false;
                 
                 setTimeout(() => {
                     closeShareModal();
-                }, 2000);
+                }, 1000);
                 
                 console.log('Document shared with:', email);
             }, 1500);
@@ -1279,6 +1447,35 @@
         function validateEmail(email) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return emailRegex.test(email);
+        }
+
+        // Notification Functions
+        function showNotification(title, message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationTitle = document.getElementById('notificationTitle');
+            const notificationMessage = document.getElementById('notificationMessage');
+            const notificationIcon = notification.querySelector('.notification-icon i');
+            
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            // Set icon based on type
+            if (type === 'info') {
+                notificationIcon.className = 'fas fa-info';
+            } else {
+                notificationIcon.className = 'fas fa-check';
+            }
+            
+            notification.classList.add('show');
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                hideNotification();
+            }, 5000);
+        }
+
+        function hideNotification() {
+            document.getElementById('notification').classList.remove('show');
         }
 
         // Event Listeners
