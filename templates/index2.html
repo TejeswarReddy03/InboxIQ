@@ -534,6 +534,22 @@
             border-color: var(--primary-green);
         }
 
+        .email-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .email-input-wrapper .email-input {
+            flex: 1;
+            margin: 0;
+        }
+
+        .email-input-wrapper .editor-btn {
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
         .upload-actions {
             display: flex;
             justify-content: flex-end;
@@ -1059,17 +1075,19 @@
                 <div class="email-section" id="emailSection" style="display: none;">
                     <div class="email-input-group">
                         <label class="email-label" for="uploadEmail">Share to email</label>
-                        <input type="email" class="email-input" id="uploadEmail" placeholder="Enter email address to share files">
+                        <div class="email-input-wrapper">
+                            <input type="email" class="email-input" id="uploadEmail" placeholder="Enter email address to share files">
+                            <button class="editor-btn editor-btn-primary" id="shareFilesBtn" onclick="shareUploadedFiles()" style="display: none;">
+                                <i class="fas fa-paper-plane"></i>
+                                Share File
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <div class="upload-actions">
                 <button class="editor-btn editor-btn-secondary" onclick="closeUploadModal()">Close</button>
-                <button class="editor-btn editor-btn-primary" id="shareFilesBtn" onclick="shareUploadedFiles()" style="display: none;">
-                    <i class="fas fa-paper-plane"></i>
-                    Share Files
-                </button>
             </div>
         </div>
     </div>
